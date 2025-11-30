@@ -140,6 +140,7 @@ const createPayroll = async () => {
     })
     loadingBtn.value = false
     createPayrollDialog.value = false
+    getPayroll()
     alert('Payroll Period successfully created!')
   } catch (err) {
     console.error('Error creating payroll', err);

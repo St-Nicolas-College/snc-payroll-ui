@@ -22,10 +22,12 @@
       <v-data-table density="compact" :headers="header" :items="employees" :search="search" :loading="loading"
         show-select>
         <template v-slot:[`item.actions`]="{ item }">
-          <v-btn size="small" class="mr-1" icon="mdi-account-cog-outline" variant="tonal" color="blue"
-            :to="`/employees/${item.documentId}`"></v-btn>
-          <v-btn size="small" class="mr-1" icon="mdi-account-cog-outline" variant="tonal" color="primary"
-            @click="openPayrollDialog(item)"></v-btn>
+          <!-- <v-btn size="small" class="mr-1" icon="mdi-account-cog-outline" variant="tonal" color="blue"
+            :to="`/employees/${item.documentId}`"></v-btn> -->
+          <!-- <v-btn size="small" class="mr-1" icon="mdi-account-cog-outline" variant="tonal" color="primary"
+            @click="openPayrollDialog(item)"></v-btn> -->
+          <v-btn size="small" class="mr-1" variant="tonal" color="info"
+            @click="openPayrollDialog(item)"><v-icon start>mdi-account-cog-outline</v-icon> Manage</v-btn>
           <v-btn size="small" variant="tonal" color="red" @click="deleteItem(item.documentId)">
             <v-icon>mdi-delete</v-icon> Delete
           </v-btn>
@@ -39,13 +41,14 @@
           <v-col cols="12">
             <!-- <v-text-field label="Payroll Period" v-model="form.payroll_period" /> -->
             <v-select v-model="form.payroll_period" :items="payroll" item-title="documentId" item-value="id"
-              label="Payroll Period" return-object required >
-            <template v-slot:item="{ props: itemProps, item }">
-              <!-- <v-list-item v-bind="itemProps" :subtitle="item.raw.payroll_period_start"></v-list-item> -->
-              <v-list-item v-bind="itemProps">
-                <v-list-item-subtitle>{{ item.raw.payroll_period_start }} - {{ item.raw.payroll_period_end }}</v-list-item-subtitle>
-              </v-list-item>
-            </template>
+              label="Payroll Period" return-object required>
+              <template v-slot:item="{ props: itemProps, item }">
+                <!-- <v-list-item v-bind="itemProps" :subtitle="item.raw.payroll_period_start"></v-list-item> -->
+                <v-list-item v-bind="itemProps">
+                  <v-list-item-subtitle>{{ item.raw.payroll_period_start }} - {{ item.raw.payroll_period_end
+                  }}</v-list-item-subtitle>
+                </v-list-item>
+              </template>
             </v-select>
           </v-col>
 
@@ -222,10 +225,47 @@ const computeValues = () => {
 watch(form, computeValues, { deep: true })
 
 const submitForm = async () => {
+  const payload = {
+    // payroll_period: form.value.payroll_period.documentId,
+    // employee: employee_id.value,
+    basic_pay: form?.value.basic_pay,
+    honorarium: form?.value.honorarium,
+    premium: form?.value.premium,
+    extra_loads: form?.value.extra_loads,
+    overtime: form?.value.overtime,
+    late_deduction: form?.value.late_deduction,
+    sss: form?.value.sss,
+    philhealth: form?.value.philhealth,
+    pagibig: form?.value.pagibig,
+    withholding_tax: form?.value.withholding_tax,
+    sss_loan: form?.value.sss_loan,
+    pagibig_loan: form?.value.pagibig_loan,
+    cash_advance: form?.value.cash_advance,
+    health_card: form?.value.health_card
+  }
+  console.log("Form data: ", payload)
+
   await $fetch(`${baseUrl}/api/payslips`, {
     method: 'POST',
     body: {
-      data: form.value
+      data: {
+        payroll_period: form.value?.payroll_period.documentId,
+        employee: employee_id.value,
+        basic_pay: form?.value.basic_pay,
+        honorarium: form?.value.honorarium,
+        premium: form?.value.premium,
+        extra_loads: form?.value.extra_loads,
+        overtime: form?.value.overtime,
+        late_deduction: form?.value.late_deduction,
+        sss: form?.value.sss,
+        philhealth: form?.value.philhealth,
+        pagibig: form?.value.pagibig,
+        withholding_tax: form?.value.withholding_tax,
+        sss_loan: form?.value.sss_loan,
+        pagibig_loan: form?.value.pagibig_loan,
+        cash_advance: form?.value.cash_advance,
+        health_card: form?.value.health_card
+      }
     }
   })
 
