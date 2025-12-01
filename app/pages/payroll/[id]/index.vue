@@ -7,8 +7,10 @@
         <v-spacer></v-spacer>
         <v-btn class="my-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-plus" color="primary"
           :to="`/payroll/${route.params.id}/create`">Add Payroll</v-btn>
+        <v-btn class="my-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-plus" color="primary"
+          @click="openEmployeeDialog">Add Employee Payroll</v-btn>
 
-          <!-- <PayrollEmployeePayrollForm @saved="fetchEmployeePayroll"/> -->
+        <!-- <PayrollEmployeePayrollForm @saved="fetchEmployeePayroll"/> -->
 
       </v-toolbar>
       <v-divider></v-divider>
@@ -75,6 +77,120 @@
         </v-data-table>
       </v-card-text>
     </v-card>
+
+
+    <v-dialog v-model="createEmployeePayrollDialog" width="1000">
+      <v-card>
+        <v-toolbar></v-toolbar>
+        <v-card-text>
+
+          <v-row dense>
+            <v-row>
+              <v-col cols="12" md="6">
+                <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                  <v-row :dense="compact">
+                    <v-col cols="7" class="font-weight-bold"> Payroll Cover Start:</v-col>
+                    <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_start)
+                      }}</v-col>
+                  </v-row>
+                </v-card>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                  <v-row :dense="compact">
+                    <v-col cols="7" class="font-weight-bold"> Payroll Cover End:</v-col>
+                    <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_end)
+                      }}</v-col>
+                  </v-row>
+                </v-card>
+              </v-col>
+            </v-row>
+
+            <v-col cols="12">
+              <v-text-field label="Payroll Period ID" v-model="form.payroll_period" />
+            </v-col>
+
+            <v-col cols="12">
+              <!-- <v-text-field label="Employee ID" v-model="form.employee" /> -->
+              <!-- <v-select v-model="form.employee" :items="employees" item-title="employee_name" item-value="documentId" label="Employee ID" return-object></v-select> -->
+              <v-autocomplete v-model="employee" :items="employees" item-title="employee_name" item-value="documentId"
+                label="Employee ID" return-object>
+
+              </v-autocomplete>
+              
+            </v-col>
+
+            <v-divider class="my-2" />
+
+            <!-- <v-col cols="3" v-for="field in [
+              'basic_pay', 'honorarium', 'premium', 'extra_loads',
+              'overtime', 'late_deduction'
+            ]" :key="field">
+              <v-text-field type="number" :label="field" v-model.number="form[field]" />
+            </v-col> -->
+
+            <v-col cols="3">
+              <v-text-field label="Basic Pay" type="number" v-model="basicPay" />
+            </v-col>
+            <v-col cols="3">
+              <v-text-field label="Honorarium" type="number" v-model="honorarium" />
+            </v-col>
+            <v-col cols="3">
+              <v-text-field label="Premium" type="number" v-model="premium" />
+            </v-col>
+            <!-- <v-col cols="3">
+              <v-text-field label="Honorarium" type="number" v-model="honorarium" />
+            </v-col> -->
+             <v-col cols="3">
+              <v-text-field label="Amount Per Unit" type="number" v-model="amountPerUnit" />
+            </v-col>
+             <v-col cols="3">
+              <v-text-field label="No of Units" type="number" v-model="noOfUnits" />
+            </v-col>
+             <v-col cols="3">
+              <v-text-field label="Units Total Amount" type="number" v-model="unitsTotalAmount" />
+            </v-col>
+             <v-col cols="3">
+              <v-text-field label="Overtime" type="number" v-model="overtime" />
+            </v-col>
+             <v-col cols="3">
+              <v-text-field label="Late" type="number" v-model="late" />
+            </v-col>
+
+            <v-col cols="12">
+              <v-text-field label="Gross Pay" v-model="grossPay" readonly />
+            </v-col>
+
+            <v-divider class="my-2" />
+
+            <v-col cols="3" v-for="field in ['sss', 'philhealth', 'pagibig']" :key="field">
+              <v-text-field type="number" :label="field" v-model.number="form[field]" />
+            </v-col>
+
+            <v-col cols="12">
+              <v-text-field label="Net Gross Pay" v-model="form.net_gross_pay" readonly />
+            </v-col>
+
+            <v-divider class="my-2" />
+
+            <v-col cols="3" v-for="field in [
+              'withholding_tax', 'sss_loan', 'pagibig_loan', 'cash_advance', 'health_card'
+            ]" :key="field">
+              <v-text-field type="number" :label="field" v-model.number="form[field]" />
+            </v-col>
+
+            <v-col cols="12">
+              <v-text-field label="Net Pay" v-model="form.net_pay" readonly />
+            </v-col>
+
+            <v-col cols="12">
+              <v-btn color="primary" @click="submitForm">Save Payslip</v-btn>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -117,8 +233,45 @@ const header = [
   { title: 'Actions', key: 'actions', align: 'end', sortable: false },
 ];
 
+const employees = ref([])
+const employee_id = ref('')
+const form = ref({
+  payroll_period: route.params.id,
+  employee: employee_id,
+  basic_pay: 0,
+  honorarium: 0,
+  premium: 0,
+  extra_loads: 0,
+  overtime: 0,
+  late_deduction: 0,
+  sss: 0,
+  philhealth: 0,
+  pagibig: 0,
+  withholding_tax: 0,
+  sss_loan: 0,
+  pagibig_loan: 0,
+  cash_advance: 0,
+  health_card: 0
+})
 const payrollDetails = ref({})
+const createEmployeePayrollDialog = ref(false)
+const employee = ref("")
+const basicPay = ref(0)
+const honorarium = ref(0)
+const premium = ref(0)
+const amountPerUnit = ref(0)
+const sss = ref(0)
+const philhealth = ref(0)
+const pagibig = ref(0)
+const cashAdvanceAmount = ref(0)
+const cashAdvanceBalance = ref(0)
+const grossPay = ref(0)
 
+
+const openEmployeeDialog = async () => {
+  fetchEmployee();
+  createEmployeePayrollDialog.value = true
+}
 
 
 const fetchPayroll = async () => {
@@ -127,9 +280,13 @@ const fetchPayroll = async () => {
       'populate': '*'
     }
   })
-
   payrollDetails.value = res.data;
   console.log('Payroll Details:', res.data)
+}
+
+const fetchEmployee = async () => {
+  const res = await $fetch(`${baseUrl}/api/employees`);
+  employees.value = res.data
 }
 
 // Format the date created
@@ -145,10 +302,38 @@ const fetchEmployeePayroll = async () => {
   console.log("Saved employee payroll")
 }
 
+const submitForm = async () => {
+  const payload = {
+    payroll_period: form.value?.payroll_period,
+    employee: form.value?.employee.documentId
+  }
+
+  console.log("Submitted: ", payload)
+}
+
+const computeValues = () => {
+  grossPay.value = basicPay.value + honorarium.value + premium.value + unitsTotalAmount.value + overtime.value - late.value
+}
 
 onMounted(async () => {
   await fetchPayroll();
 })
+
+// watch([employee] , async () => {
+//   if (employee.value) {
+//     basicPay.value = employee.value?.basic_pay;
+//     honorarium.value = employee.value?.honorarium
+
+//   }
+// })
+
+watch(employee, () => { 
+    if (employee.value) {
+    basicPay.value = employee.value?.basic_pay;
+    honorarium.value = employee.value?.honorarium
+  }
+  
+  })
 </script>
 
 <style></style>
