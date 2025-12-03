@@ -372,17 +372,24 @@ const submitForm = async () => {
         basic_pay: form?.value.basic_pay,
         honorarium: form?.value.honorarium,
         premium: form?.value.premium,
-        extra_loads: form?.value.extra_loads,
+        amount_per_unit: form?.value.amount_per_unit,
+        no_of_unit: form?.value.no_of_unit,
+        units_total_amount: form?.value.units_total_amount,
         overtime: form?.value.overtime,
         late_deduction: form?.value.late_deduction,
+        gross_pay: form?.value.gross_pay,
         sss: form?.value.sss,
         philhealth: form?.value.philhealth,
         pagibig: form?.value.pagibig,
+        net_gross_pay: form?.value.net_gross_pay,
         withholding_tax: form?.value.withholding_tax,
         sss_loan: form?.value.sss_loan,
         pagibig_loan: form?.value.pagibig_loan,
-        cash_advance: form?.value.cash_advance,
-        health_card: form?.value.health_card
+        cash_advance_amount: form?.value.cash_advance_amount,
+        cash_advance_balance: form?.value.cash_advance_balance,
+        cash_advance_deduction: form?.value.cash_advance_deduction,
+        health_card: form?.value.health_card,
+        net_pay: form?.value.net_pay
       }
     }
   })
