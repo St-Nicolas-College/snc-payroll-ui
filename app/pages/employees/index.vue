@@ -182,6 +182,7 @@ const header = [
   { title: 'Actions', key: 'actions', align: 'end', sortable: false },
 ];
 
+const formValid = ref(null)
 const employees = ref([])
 const employee_id = ref('')
 const createPayrollDialog = ref(false)

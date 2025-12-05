@@ -20,37 +20,37 @@
             <v-row>
               <v-col cols="12" md="3">
                 <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                  <v-row :dense="compact">
+                  <v-row dense>
                     <v-col cols="7" class="font-weight-bold"> Payroll Cover Start:</v-col>
                     <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_start)
-                      }}</v-col>
+                    }}</v-col>
                   </v-row>
                 </v-card>
               </v-col>
 
               <v-col cols="12" md="3">
                 <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                  <v-row :dense="compact">
+                  <v-row dense>
                     <v-col cols="7" class="font-weight-bold"> Payroll Cover End:</v-col>
                     <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_end)
-                      }}</v-col>
+                    }}</v-col>
                   </v-row>
                 </v-card>
               </v-col>
 
               <v-col cols="12" md="3">
                 <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                  <v-row :dense="compact">
+                  <v-row dense>
                     <v-col cols="7" class="font-weight-bold"> Payroll Created:</v-col>
                     <v-col cols="5"> {{ formatDate(payrollDetails.createdAt)
-                      }}</v-col>
+                    }}</v-col>
                   </v-row>
                 </v-card>
               </v-col>
 
               <v-col cols="12" md="3">
                 <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                  <v-row :dense="compact">
+                  <v-row dense>
                     <v-col cols="7" class="font-weight-bold"> Created By:</v-col>
                     <v-col cols="5"> </v-col>
                   </v-row>
@@ -78,135 +78,301 @@
     </v-card>
 
 
-    <v-dialog v-model="createEmployeePayrollDialog" width="1000">
+    <v-dialog v-model="createEmployeePayrollDialog" transition="dialog-bottom-transition" fullscreen scrollable>
       <v-card>
-        <v-toolbar></v-toolbar>
+        <v-toolbar>
+          <v-btn icon="mdi-close" @click="createEmployeePayrollDialog = false"></v-btn>
+          <v-toolbar-title>Payroll Enlistment</v-toolbar-title>
+          <!-- <v-btn color="primary" variant="flat"><v-icon start>mdi-content-save</v-icon> Save</v-btn> -->
+          <v-toolbar-items>
+            <v-btn color="primary" variant="flat" @click="submitForm">
+              <v-icon start>mdi-content-save</v-icon>
+              Save
+            </v-btn>
+          </v-toolbar-items>
+        </v-toolbar>
         <v-card-text>
 
-          <v-row dense>
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                  <v-row :dense="compact">
-                    <v-col cols="7" class="font-weight-bold"> Payroll Cover Start:</v-col>
-                    <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_start)
-                      }}</v-col>
-                  </v-row>
-                </v-card>
+          <h3 class="text-center">Payroll Period</h3>
+          <h4 class="text-center">{{ formatDate(payrollDetails.payroll_period_start)
+            }} - {{ formatDate(payrollDetails.payroll_period_end)
+            }}</h4>
+
+
+          <!-- <v-row dense class="myh-4">
+            <v-col cols="12" md="6">
+              <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                <v-row dense>
+                  <v-col cols="7" class="font-weight-bold"> Payroll Cover Start:</v-col>
+                  <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_start)
+                  }}</v-col>
+                </v-row>
+              </v-card>
+            </v-col>
+
+            <v-col cols="12" md="6">
+              <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                <v-row dense>
+                  <v-col cols="7" class="font-weight-bold"> Payroll Cover End:</v-col>
+                  <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_end)
+                  }}</v-col>
+                </v-row>
+              </v-card>
+            </v-col>
+          </v-row> -->
+          <v-divider class="my-4"></v-divider>
+          <v-form ref="payrollEnlistmentForm" v-model="formValid" lazy-validation>
+
+            <v-row dense>
+
+
+              <v-col cols="6" class="ml-4">
+
+                <p class="font-weight-bold mb-4"><v-icon start>mdi-account</v-icon> Employee Information</p>
+
+                <v-row no-gutters>
+                  <v-col cols="3" class="font-weight-bold">Employee Name</v-col>
+                  <v-col cols="1">:</v-col>
+                  <v-col cols="6">{{ employeeName }}</v-col>
+                </v-row>
+                <v-row no-gutters>
+                  <v-col cols="3" class="font-weight-bold">Position</v-col>
+                  <v-col cols="1">:</v-col>
+                  <v-col cols="6">{{ position }}</v-col>
+                </v-row>
+                <v-row no-gutters>
+                  <v-col cols="3" class="font-weight-bold">Department</v-col>
+                  <v-col cols="1">:</v-col>
+                  <v-col cols="6">{{ department }}</v-col>
+                </v-row>
+                <v-divider class="my-4"></v-divider>
+                <p class="font-weight-bold mb-3 mt-5"><v-icon start>mdi-credit-card-outline</v-icon> Salary Information
+                </p>
+
+                <v-row>
+                  <v-col cols="12" md="6">
+                    <v-row no-gutters>
+                      <v-col cols="5">Basic Pay</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ basicPay }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">Honorarium</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ honorarium }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">Premium</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ premium }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">Amount Per Unit</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ amountPerUnit }}</v-col>
+                    </v-row>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-row no-gutters>
+                      <v-col cols="5">No. of Units</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ noOfUnits }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">Units Total Amount</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ unitsTotalAmount }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">Overtime</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ overtime }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">Late</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ late }}</v-col>
+                    </v-row>
+                  </v-col>
+                </v-row>
+
+
+                <v-divider class="mt-2"></v-divider>
+                <v-row no-gutters class="my-2">
+                  <v-col cols="3" class="font-weight-bold">Gross Pay</v-col>
+                  <v-col cols="1">:</v-col>
+                  <v-col cols="6" class="font-weight-bold">{{ grossPay }}</v-col>
+                </v-row>
+                <v-divider></v-divider>
+                <v-list-subheader class="font-weight-bold mt-2">Premiums</v-list-subheader>
+                <v-row>
+                  <v-col cols="12" md="6">
+                    <v-row no-gutters>
+                      <v-col cols="5">SSS</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ sss }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">Philhealth</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ philhealth }}</v-col>
+                    </v-row>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-row no-gutters>
+                      <v-col cols="5">Pag-Ibig</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ pagibig }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">Total Premiums</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6" class="font-weight-bold">{{ totalPremiums }}</v-col>
+                    </v-row>
+                  </v-col>
+                </v-row>
+
+
+
+                <v-divider class="mt-2"></v-divider>
+                <v-row no-gutters class="my-2">
+                  <v-col cols="3" class="font-weight-bold">Net Gross Pay</v-col>
+                  <v-col cols="1">:</v-col>
+                  <v-col cols="6" class="font-weight-bold">{{ netGrossPay }}</v-col>
+                </v-row>
+                <v-divider></v-divider>
+
+                <v-list-subheader class="font-weight-bold mt-2">Other Deductions</v-list-subheader>
+                <v-row>
+                  <v-col cols="12" md="6">
+
+                    <v-row no-gutters>
+                      <v-col cols="5">W/Hodling Tax</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ withHoldingTax }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">SSS Loan</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ sssLoan }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">Pag-Ibig Loan</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ pagibigLoan }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">CA Amount</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ cashAdvanceAmount }}</v-col>
+                    </v-row>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-row no-gutters>
+                      <v-col cols="5">CA Balance</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ cashAdvanceBalance }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">CA Deduction</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ cashAdvanceDeduction }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">Health Card</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ healthCard }}</v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                      <v-col cols="5">Total Other Deductions</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6" class="font-weight-bold">{{ otherDeductionsTotal }}</v-col>
+                    </v-row>
+                  </v-col>
+                </v-row>
+
+                <v-divider class="mt-2"></v-divider>
+                <v-row no-gutters class="my-2">
+                  <v-col cols="3" class="font-weight-bold">Total Net Pay</v-col>
+                  <v-col cols="1">:</v-col>
+                  <v-col cols="6" class="font-weight-bold">{{ netPay }}</v-col>
+                </v-row>
+                <v-divider></v-divider>
+
+              </v-col>
+              <v-divider opacity=".8" thickness="3" gradient vertical></v-divider>
+              <v-col cols="5" class="ml-4 mt-5">
+                <!-- <p class="font-weight-bold mb-4"><v-icon start>mdi-credit-card-outline</v-icon> Salary Information</p>
+                <v-divider class="my-4"></v-divider> -->
+                <v-row no-gutters>
+                  <v-col cols="12">
+                    <v-autocomplete v-model="employee" :items="employees" item-title="employee_name"
+                      :rules="[rules.general]" variant="solo-filled" flat item-value="documentId"
+                      label="Select Employee" return-object required>
+                    </v-autocomplete>
+                  </v-col>
+                </v-row>
+
+                <v-row dense>
+                  <v-col cols="12" md="4">
+                    <v-text-field label="No of Units" variant="solo-filled" flat type="number" v-model="noOfUnits" />
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-text-field label="Overtime" variant="solo-filled" flat type="number" v-model="overtime" />
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-text-field label="Lates" variant="solo-filled" flat type="number" v-model="late" />
+                  </v-col>
+                </v-row>
+                <p class="font-weight-bold my-3">Premiums</p>
+                <v-row dense>
+                  <v-col cols="12" md="4">
+                    <v-text-field label="SSS" variant="solo-filled" flat type="number" v-model="sss" />
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-text-field label="Philhealth" variant="solo-filled" flat type="number" v-model="philhealth" />
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-text-field label="Pag-Ibig" variant="solo-filled" flat type="number" v-model="pagibig" />
+                  </v-col>
+                </v-row>
+                <p class="font-weight-bold my-3">Other Deductions</p>
+                <v-row dense>
+                  <v-col cols="12" md="4">
+                    <v-text-field label="W/Holding Tax" variant="solo-filled" flat type="number"
+                      v-model="withHoldingTax" />
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-text-field label="SSS Loan" variant="solo-filled" flat type="number" v-model="sssLoan" />
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-text-field label="Pag-Ibig Loan" variant="solo-filled" flat type="number"
+                      v-model="pagibigLoan" />
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col cols="12" md="4">
+                    <v-text-field label="Cash Advance Deduction" variant="solo-filled" flat type="number"
+                      v-model="cashAdvanceDeduction" />
+                  </v-col>
+                  <v-col cols="12" md="4">
+                    <v-text-field label="Health Card" variant="solo-filled" flat type="number" v-model="healthCard" />
+                  </v-col>
+
+                </v-row>
+
+
               </v-col>
 
-              <v-col cols="12" md="6">
-                <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                  <v-row :dense="compact">
-                    <v-col cols="7" class="font-weight-bold"> Payroll Cover End:</v-col>
-                    <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_end)
-                      }}</v-col>
-                  </v-row>
-                </v-card>
-              </v-col>
+
             </v-row>
 
-            <v-col cols="12">
-              <v-text-field label="Payroll Period ID" v-model="payroll_period" />
-            </v-col>
 
-            <v-col cols="12">
-              <!-- <v-text-field label="Employee ID" v-model="form.employee" /> -->
-              <!-- <v-select v-model="form.employee" :items="employees" item-title="employee_name" item-value="documentId" label="Employee ID" return-object></v-select> -->
-              <v-autocomplete v-model="employee" :items="employees" item-title="employee_name" item-value="documentId"
-                label="Employee ID" return-object>
 
-              </v-autocomplete>
 
-            </v-col>
 
-            <v-divider class="my-2" />
-            <v-col cols="3">
-              <v-text-field label="Basic Pay" type="number" v-model="basicPay" />
-            </v-col>
-            <v-col cols="3">
-              <v-text-field label="Honorarium" type="number" v-model="honorarium" />
-            </v-col>
-            <v-col cols="3">
-              <v-text-field label="Premium" type="number" v-model="premium" />
-            </v-col>
-            <!-- <v-col cols="3">
-              <v-text-field label="Honorarium" type="number" v-model="honorarium" />
-            </v-col> -->
-            <v-col cols="3">
-              <v-text-field label="Amount Per Unit" type="number" v-model="amountPerUnit" />
-            </v-col>
-            <v-col cols="3">
-              <v-text-field label="No of Units" type="number" v-model="noOfUnits" />
-            </v-col>
-            <v-col cols="3">
-              <v-text-field label="Units Total Amount" type="number" v-model="unitsTotalAmount" />
-            </v-col>
-            <v-col cols="3">
-              <v-text-field label="Overtime" type="number" v-model.number="overtime" />
-            </v-col>
-            <v-col cols="3">
-              <v-text-field label="Late" type="number" v-model="late" />
-            </v-col>
 
-            <v-col cols="12">
-              <v-text-field label="Gross Pay" v-model="grossPay" readonly />
-            </v-col>
-
-            <v-divider class="my-2" />
-            <v-col cols="3">
-              <v-text-field type="number" label="SSS" v-model="sss" />
-            </v-col>
-            <v-col cols="3">
-              <v-text-field type="number" label="Philhealth" v-model="philhealth" />
-            </v-col>
-            <v-col cols="3">
-              <v-text-field type="number" label="Pag-Ibig" v-model="pagibig" />
-            </v-col>
-            <v-col>
-              <v-text-field type="number" label="Total Premiums" v-model="totalPremiums"></v-text-field>
-            </v-col>
-
-            <v-col cols="12">
-              <v-text-field label="Net Gross Pay" v-model="netGrossPay" readonly />
-            </v-col>
-
-            <v-divider class="my-2" />
-
-            <v-col cols="3">
-              <v-text-field type="number" label="W/Hoding Tax" v-model="withHoldingTax"></v-text-field>
-            </v-col>
-            <v-col cols="3">
-              <v-text-field type="number" label="SSS Loan" v-model="sssLoan"></v-text-field>
-            </v-col>
-            <v-col cols="3">
-              <v-text-field type="number" label="Pag-Ibig Loan" v-model="pagibigLoan"></v-text-field>
-            </v-col>
-            <v-col cols="3">
-              <v-text-field type="number" label="Cash Advance Amount" v-model="cashAdvanceAmount"></v-text-field>
-            </v-col>
-            <v-col cols="3">
-              <v-text-field type="number" label="Cash Advance Balance" v-model="cashAdvanceBalance"></v-text-field>
-            </v-col>
-            <v-col cols="3">
-              <v-text-field type="number" label="Cash Advance Deduction" v-model="cashAdvanceDeduction"></v-text-field>
-            </v-col>
-            <v-col cols="3">
-              <v-text-field type="number" label="Health Card" v-model="healthCard"></v-text-field>
-            </v-col>
-            <v-col cols="12">
-              <v-text-field type="number" label="Other Deductions Total" readonly
-                v-model="otherDeductionsTotal"></v-text-field>
-            </v-col>
-
-            <v-col cols="12">
-              <v-text-field label="Net Pay" v-model="netPay" readonly />
-            </v-col>
-
-            <v-col cols="12">
-              <v-btn color="primary" @click="submitForm">Save Payslip</v-btn>
-            </v-col>
-          </v-row>
+          </v-form>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -251,12 +417,18 @@ const header = [
   // { title: 'Rate per hour', key: 'rate_per_hour', sortable: false },
   { title: 'Actions', key: 'actions', align: 'end', sortable: false },
 ];
-
+const search = ref('')
+const loading = ref(true)
+const payrollEnlistmentForm = ref(null)
+const formValid = ref(true)
 const employees = ref([])
 const payrollDetails = ref({})
 const createEmployeePayrollDialog = ref(false)
 const payroll_period = route.params.id
 const employee = ref("")
+const employeeName = ref('')
+const position = ref("")
+const department = ref("")
 const basicPay = ref(0)
 const honorarium = ref(0)
 const premium = ref(0)
@@ -279,6 +451,10 @@ const cashAdvanceDeduction = ref(0)
 const healthCard = ref(0)
 //const netPay = ref(0)
 
+const rules = {
+  general: (v) => !!v || "This field is required"
+}
+
 
 
 const openEmployeeDialog = async () => {
@@ -291,6 +467,7 @@ const fetchPayroll = async () => {
   const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?populate[payslips][populate]=*`, {
 
   })
+  loading.value = false
   payrollDetails.value = res.data;
   console.log('Payroll Details:', res.data)
 }
@@ -322,42 +499,49 @@ const fetchEmployeePayroll = async () => {
 }
 
 const submitForm = async () => {
-  const payload = {
-    data: {
-      payroll_period: route.params.id,
-      employee: employee.value?.documentId,
-      basic_pay: basicPay.value,
-      honorarium: honorarium.value,
-      premium: premium.value,
-      amount_per_unit: amountPerUnit.value,
-      no_of_units: noOfUnits.value,
-      units_total_amount: unitsTotalAmount.value,
-      overtime: overtime.value,
-      late_deduction: late.value,
-      gross_pay: grossPay.value,
-      sss: sss.value,
-      philhealth: philhealth.value,
-      pagibig: pagibig.value,
-      net_gross_pay: netGrossPay.value,
-      withholding_tax: withHoldingTax.value,
-      sss_loan: sssLoan.value,
-      pagibig_loan: pagibigLoan.value,
-      cash_advance_amount: cashAdvanceAmount.value,
-      cash_advance_balance: cashAdvanceBalance.value,
-      cash_advance_deduction: cashAdvanceDeduction.value,
-      health_card: healthCard.value,
-      net_pay: netPay.value
+  const isValid = await payrollEnlistmentForm.value?.validate();
+  if (isValid.valid) {
+    const payload = {
+      data: {
+        payroll_period: route.params.id,
+        employee: employees.value?.documentId,
+        basic_pay: basicPay.value,
+        honorarium: honorarium.value,
+        premium: premium.value,
+        amount_per_unit: amountPerUnit.value,
+        no_of_units: noOfUnits.value,
+        units_total_amount: unitsTotalAmount.value,
+        overtime: overtime.value,
+        late_deduction: late.value,
+        gross_pay: grossPay.value,
+        sss: sss.value,
+        philhealth: philhealth.value,
+        pagibig: pagibig.value,
+        net_gross_pay: netGrossPay.value,
+        withholding_tax: withHoldingTax.value,
+        sss_loan: sssLoan.value,
+        pagibig_loan: pagibigLoan.value,
+        cash_advance_amount: cashAdvanceAmount.value,
+        cash_advance_balance: cashAdvanceBalance.value,
+        cash_advance_deduction: cashAdvanceDeduction.value,
+        health_card: healthCard.value,
+        net_pay: netPay.value
+      }
     }
+    console.log("Submitted: ", payload)
+
+    await $fetch(`${baseUrl}/api/payslips`, {
+      method: 'POST',
+      body: payload
+    })
+
+    alert(`Payroll for ${employee.value?.employee_name} successfully created `)
+
+    payrollEnlistmentForm.value?.reset()
+    employee.value = ""
+    fetchPayroll();
   }
-  console.log("Submitted: ", payload)
 
-  await $fetch(`${baseUrl}/api/payslips`, {
-    method: 'POST',
-    body: payload
-  })
-
-  alert(`Payroll for ${employee.value?.employee_name} successfully created `)
-  fetchPayroll();
 }
 
 // const computeValues = () => {
@@ -380,7 +564,7 @@ const netGrossPay = computed(() => {
 })
 
 const otherDeductionsTotal = computed(() => {
-  return Number(withHoldingTax.value) + Number(sssLoan.value) + Number(pagibigLoan.value) + Number(cashAdvanceDeduction.value)
+  return Number(withHoldingTax.value) + Number(sssLoan.value) + Number(pagibigLoan.value) + Number(cashAdvanceDeduction.value) + Number(healthCard.value)
 })
 
 const netPay = computed(() => {
@@ -396,6 +580,9 @@ onMounted(async () => {
 
 watch(employee, () => {
   if (employee.value) {
+    employeeName.value = employee.value?.employee_name
+    position.value = employee.value?.position
+    department.value = employee.value?.department
     basicPay.value = employee.value?.basic_pay / 2;
     honorarium.value = employee.value?.honorarium / 2
     premium.value = employee.value?.premium / 2
