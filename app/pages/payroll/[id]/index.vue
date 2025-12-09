@@ -64,7 +64,7 @@
 
     <v-card elevation="0" rounded="lg" class="mt-5">
       <v-card-text>
-        <v-data-table density="compact" :headers="header" :items="payrollDetails.payslips" :search="search"
+        <v-data-table density="compact" :items-per-page="-1"  :hide-default-footer="true" :headers="header" :items="payrollDetails.payslips" :search="search"
           :loading="loading">
           <template v-slot:[`item.actions`]="{ item }">
             <!-- <v-btn size="small" class="mr-1" icon="mdi-account-cog-outline" variant="tonal" color="blue"
@@ -81,10 +81,11 @@
     <v-dialog v-model="createEmployeePayrollDialog" transition="dialog-bottom-transition" fullscreen scrollable>
       <v-card>
         <v-toolbar>
-          <v-btn icon="mdi-close" @click="createEmployeePayrollDialog = false"></v-btn>
+          <v-btn icon="mdi-close" @click="closeCreateEmployeePayrollDialog"></v-btn>
           <v-toolbar-title>Payroll Enlistment</v-toolbar-title>
           <!-- <v-btn color="primary" variant="flat"><v-icon start>mdi-content-save</v-icon> Save</v-btn> -->
           <v-toolbar-items>
+            <v-btn color="warning" variant="flat" @click="resetFormCreateEmployee">Reset</v-btn>
             <v-btn color="primary" variant="flat" @click="submitForm">
               <v-icon start>mdi-content-save</v-icon>
               Save
@@ -306,9 +307,13 @@
                 <v-divider class="my-4"></v-divider> -->
                 <v-row no-gutters>
                   <v-col cols="12">
-                    <v-autocomplete v-model="employee" :items="employees" item-title="employee_name"
+                    <!-- <v-autocomplete v-model="employee" :items="employees" item-title="employee_name"
                       :rules="[rules.general]" variant="solo-filled" flat item-value="documentId"
                       label="Select Employee" return-object required>
+                    </v-autocomplete> -->
+                    <v-autocomplete v-model="employee" :items="employees" item-title="employee_name"
+                      variant="solo-filled" flat item-value="documentId" label="Select Employee" return-object>
+
                     </v-autocomplete>
                   </v-col>
                 </v-row>
@@ -425,7 +430,7 @@ const employees = ref([])
 const payrollDetails = ref({})
 const createEmployeePayrollDialog = ref(false)
 const payroll_period = route.params.id
-const employee = ref("")
+const employee = ref(null)
 const employeeName = ref('')
 const position = ref("")
 const department = ref("")
@@ -498,48 +503,89 @@ const fetchEmployeePayroll = async () => {
   console.log("Saved employee payroll")
 }
 
+const closeCreateEmployeePayrollDialog = async () => {
+  createEmployeePayrollDialog.value = false
+  resetFormCreateEmployee()
+}
+
+const resetFormCreateEmployee = async () => {
+  employee.value = ""
+  employeeName.value = ""
+  position.value = ""
+  department.value = ""
+  basicPay.value = 0
+  honorarium.value = 0
+  premium.value = 0
+  amountPerUnit.value = 0
+  noOfUnits.value = 0
+  unitsTotalAmount.value = 0
+  overtime.value = 0
+  late.value = 0
+  sss.value = 0
+  philhealth.value = 0;
+  pagibig.value = 0
+  withHoldingTax.value = 0
+  sssLoan.value = 0
+  pagibigLoan.value = 0
+  cashAdvanceAmount.value = 0
+  cashAdvanceBalance.value = 0
+  cashAdvanceDeduction.value = 0
+  healthCard.value = 0
+}
+
 const submitForm = async () => {
   const isValid = await payrollEnlistmentForm.value?.validate();
   if (isValid.valid) {
-    const payload = {
-      data: {
-        payroll_period: route.params.id,
-        employee: employees.value?.documentId,
-        basic_pay: basicPay.value,
-        honorarium: honorarium.value,
-        premium: premium.value,
-        amount_per_unit: amountPerUnit.value,
-        no_of_units: noOfUnits.value,
-        units_total_amount: unitsTotalAmount.value,
-        overtime: overtime.value,
-        late_deduction: late.value,
-        gross_pay: grossPay.value,
-        sss: sss.value,
-        philhealth: philhealth.value,
-        pagibig: pagibig.value,
-        net_gross_pay: netGrossPay.value,
-        withholding_tax: withHoldingTax.value,
-        sss_loan: sssLoan.value,
-        pagibig_loan: pagibigLoan.value,
-        cash_advance_amount: cashAdvanceAmount.value,
-        cash_advance_balance: cashAdvanceBalance.value,
-        cash_advance_deduction: cashAdvanceDeduction.value,
-        health_card: healthCard.value,
-        net_pay: netPay.value
+
+    try {
+      const payload = {
+        data: {
+          payroll_period: route.params.id,
+          employee: employee.value?.documentId,
+          basic_pay: basicPay.value,
+          honorarium: honorarium.value,
+          premium: premium.value,
+          amount_per_unit: amountPerUnit.value,
+          no_of_units: noOfUnits.value,
+          units_total_amount: unitsTotalAmount.value,
+          overtime: overtime.value,
+          late_deduction: late.value,
+          gross_pay: grossPay.value,
+          sss: sss.value,
+          philhealth: philhealth.value,
+          pagibig: pagibig.value,
+          net_gross_pay: netGrossPay.value,
+          withholding_tax: withHoldingTax.value,
+          sss_loan: sssLoan.value,
+          pagibig_loan: pagibigLoan.value,
+          cash_advance_amount: cashAdvanceAmount.value,
+          cash_advance_balance: cashAdvanceBalance.value,
+          cash_advance_deduction: cashAdvanceDeduction.value,
+          health_card: healthCard.value,
+          net_pay: netPay.value
+        }
       }
+      console.log("Submitted: ", payload)
+      //console.log("Employee: ", employee.value)
+
+      await $fetch(`${baseUrl}/api/payslips`, {
+        method: 'POST',
+        body: payload,
+      })
+
+      alert(`Payroll for ${employee.value?.employee_name} successfully created `)
+      payrollEnlistmentForm.value?.reset()
+      resetFormCreateEmployee()
+      createEmployeePayrollDialog.value = false
+      fetchPayroll();
+
+    } catch (err) {
+      const message = err?.response?._data?.error?.message || "Unknown error";
+      console.log("Error message: ", message)
+      alert(message)
     }
-    console.log("Submitted: ", payload)
 
-    await $fetch(`${baseUrl}/api/payslips`, {
-      method: 'POST',
-      body: payload
-    })
 
-    alert(`Payroll for ${employee.value?.employee_name} successfully created `)
-
-    payrollEnlistmentForm.value?.reset()
-    employee.value = ""
-    fetchPayroll();
   }
 
 }
