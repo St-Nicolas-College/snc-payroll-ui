@@ -5,8 +5,9 @@
       <v-toolbar color="transparent">
         <v-toolbar-title><v-icon start>mdi-cash-clock</v-icon> Payroll Details</v-toolbar-title>
         <v-spacer></v-spacer>
-        <!-- <v-btn class="my-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-plus" color="primary"
-          :to="`/payroll/${route.params.id}/create`">Add Payroll</v-btn> -->
+        <v-btn class="my-2 mr-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-printer" color="info"
+          >Print Payroll</v-btn>
+         
         <v-btn class="my-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-plus" color="primary"
           @click="openEmployeeDialog">Add Employee Payroll</v-btn>
 
@@ -84,6 +85,8 @@
         </v-data-table>
       </v-card-text>
     </v-card>
+
+     <PayslipPrint :payslip="payrollDetails.payslips" />
 
 
     <v-dialog v-model="createEmployeePayrollDialog" transition="dialog-bottom-transition" fullscreen scrollable>
