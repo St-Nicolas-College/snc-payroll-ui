@@ -5,9 +5,16 @@
       <v-toolbar color="transparent">
         <v-toolbar-title><v-icon start>mdi-cash-clock</v-icon> Payroll Details</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn class="my-2 mr-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-printer" color="info"
-          >Print Payroll</v-btn>
-         
+        <!-- <v-btn class="my-2 mr-2 text-capitalize" :to="`/payroll/${route.params.id}/print`" variant="elevated"
+          elevation="0" prepend-icon="mdi-printer" color="info" target="_blank" rel="noopener noreferrer">Print
+          Payroll</v-btn> -->
+
+        <v-btn class="my-2 mr-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-printer"
+          color="info" @click="openPrintWindow">
+          Print Payroll
+        </v-btn>
+
+
         <v-btn class="my-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-plus" color="primary"
           @click="openEmployeeDialog">Add Employee Payroll</v-btn>
 
@@ -65,7 +72,7 @@
 
     <v-card elevation="0" rounded="lg" class="mt-5">
       <v-card-title class="d-flex align-center pe-2">
-       Total Net Pay: {{ formatCurrency(totalNetPay) }}
+        Total Net Pay: {{ formatCurrency(totalNetPay) }}
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
         <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
@@ -86,7 +93,7 @@
       </v-card-text>
     </v-card>
 
-     <PayslipPrint :payslip="payrollDetails.payslips" />
+    <!-- <PayslipPrint :payslip="payrollDetails.payslips" /> -->
 
 
     <v-dialog v-model="createEmployeePayrollDialog" transition="dialog-bottom-transition" fullscreen scrollable>
@@ -286,6 +293,11 @@
                       <v-col cols="1">:</v-col>
                       <v-col cols="6">{{ formatCurrency(cashAdvanceBalance) }}</v-col>
                     </v-row>
+                     <!-- <v-row no-gutters>
+                      <v-col cols="5">CA New Balance</v-col>
+                      <v-col cols="1">:</v-col>
+                      <v-col cols="6">{{ formatCurrency(cashAdvanceNewBalance) }}</v-col>
+                    </v-row> -->
                     <v-row no-gutters>
                       <v-col cols="5">CA Deduction</v-col>
                       <v-col cols="1">:</v-col>
@@ -453,6 +465,7 @@ const sssLoan = ref(0)
 const pagibigLoan = ref(0)
 const cashAdvanceAmount = ref(0)
 const cashAdvanceBalance = ref(0)
+const originalCashAdvanceBalance = ref(0)
 const cashAdvanceDeduction = ref(0)
 const healthCard = ref(0)
 //const netPay = ref(0)
@@ -489,6 +502,34 @@ const fetchPayroll = async () => {
 const fetchEmployee = async () => {
   const res = await $fetch(`${baseUrl}/api/employees`);
   employees.value = res.data
+}
+
+const openPrintWindow = () => {
+  const url = `/payroll/${route.params.id}/print`
+  const width = 800
+  const height = 800
+
+  // Get current screen position (supports multi-monitor)
+  const dualScreenLeft = window.screenLeft ?? window.screenX
+  const dualScreenTop = window.screenTop ?? window.screenY
+
+  const screenWidth = window.innerWidth ?? document.documentElement.clientWidth
+  const screenHeight = window.innerHeight ?? document.documentElement.clientHeight
+
+  // Calculate center position
+  const left = (screenWidth - width) / 2 + dualScreenLeft
+  const top = (screenHeight - height) / 2 + dualScreenTop
+
+  window.open(url,
+    'printWindow',
+    `
+  width=${width}
+  height=${height}
+  top-${top}
+  left=${left}
+  resizabe=yes
+  scrollbars=yes`
+  )
 }
 
 // Format the date created
@@ -542,7 +583,7 @@ const submitForm = async () => {
       const payload = {
         data: {
           payroll_period: route.params.id,
-          employee: employee.value?.documentId,
+          employee: employee.value?.id,
           basic_pay: basicPay.value,
           honorarium: honorarium.value,
           premium: premium.value,
@@ -566,6 +607,8 @@ const submitForm = async () => {
           net_pay: netPay.value
         }
       }
+
+      // const cashAdvanceNewBalance = Number(cashAdvanceAmount.value) - Number(cashAdvanceDeduction.value)
       console.log("Submitted: ", payload)
       //console.log("Employee: ", employee.value)
 
@@ -573,6 +616,18 @@ const submitForm = async () => {
         method: 'POST',
         body: payload,
       })
+
+      // await $fetch(`${baseUrl}/api/employees/${employee.value?.documentId}`, {
+      //   method: 'PUT',
+      //   body: {
+      //     data: {
+      //       cash_advance_balance: cashAdvanceNewBalance
+      //     }
+      //   }
+      // })
+      
+      console.log("Cash Advance New Balance: ", cashAdvanceBalance.value)
+      console.log("Employee:", employee.value?.documentId)
 
       alert(`Payroll for ${employee.value?.employee_name} successfully created `)
       payrollEnlistmentForm.value?.reset()
@@ -622,6 +677,18 @@ const otherDeductionsTotal = computed(() => {
   return Number(withHoldingTax.value) + Number(sssLoan.value) + Number(pagibigLoan.value) + Number(cashAdvanceDeduction.value) + Number(healthCard.value)
 })
 
+// const cashAdvanceNewBalance = computed(() => {
+//   return Number(cashAdvanceBalance.value) - Number(cashAdvanceDeduction.value)
+// })
+
+
+const computeNewCashAdvanceBalance = (payslip) => {
+  const current = Number(payslip.employee?.cashAdvanceBalance || 0)
+  const deducted = Number(payslip.cash_advance || 0)
+
+  return Math.max(current - deducted, 0)
+}
+
 const netPay = computed(() => {
   return Number(netGrossPay.value) - Number(otherDeductionsTotal.value)
 })
@@ -659,7 +726,18 @@ watch(employee, () => {
     cashAdvanceBalance.value = employee.value?.cash_advance_balance
 
   }
+  originalCashAdvanceBalance.value = Number(
+    employee.value.cash_advance_balance || 0
+  )
 
+  cashAdvanceBalance.value = originalCashAdvanceBalance.value
+  cashAdvanceDeduction.value = 0;
+})
+
+watch(cashAdvanceDeduction, (deduction) => {
+  cashAdvanceBalance.value = Math.max(
+    originalCashAdvanceBalance.value - Number(deduction || 0), 0
+  )
 })
 </script>
 
