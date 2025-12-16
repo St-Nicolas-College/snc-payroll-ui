@@ -31,7 +31,7 @@
                   <v-row dense>
                     <v-col cols="7" class="font-weight-bold"> Payroll Cover Start:</v-col>
                     <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_start)
-                      }}</v-col>
+                    }}</v-col>
                   </v-row>
                 </v-card>
               </v-col>
@@ -41,7 +41,7 @@
                   <v-row dense>
                     <v-col cols="7" class="font-weight-bold"> Payroll Cover End:</v-col>
                     <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_end)
-                      }}</v-col>
+                    }}</v-col>
                   </v-row>
                 </v-card>
               </v-col>
@@ -51,7 +51,7 @@
                   <v-row dense>
                     <v-col cols="7" class="font-weight-bold"> Payroll Created:</v-col>
                     <v-col cols="5"> {{ formatDate(payrollDetails.createdAt)
-                      }}</v-col>
+                    }}</v-col>
                   </v-row>
                 </v-card>
               </v-col>
@@ -72,7 +72,7 @@
 
     <v-card elevation="0" rounded="lg" class="mt-5">
       <v-card-title class="d-flex align-center pe-2">
-        Total Net Pay: {{ formatCurrency(totalNetPay) }}
+        Grand Total: {{ formatCurrency(totalNetPay) }}
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
         <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
@@ -115,7 +115,7 @@
 
           <h3 class="text-center">Payroll Period</h3>
           <h4 class="text-center">{{ formatDate(payrollDetails.payroll_period_start)
-          }} - {{ formatDate(payrollDetails.payroll_period_end)
+            }} - {{ formatDate(payrollDetails.payroll_period_end)
             }}</h4>
 
 
@@ -293,7 +293,7 @@
                       <v-col cols="1">:</v-col>
                       <v-col cols="6">{{ formatCurrency(cashAdvanceBalance) }}</v-col>
                     </v-row>
-                     <!-- <v-row no-gutters>
+                    <!-- <v-row no-gutters>
                       <v-col cols="5">CA New Balance</v-col>
                       <v-col cols="1">:</v-col>
                       <v-col cols="6">{{ formatCurrency(cashAdvanceNewBalance) }}</v-col>
@@ -381,6 +381,12 @@
                 </v-row>
                 <v-row dense>
                   <v-col cols="12" md="4">
+                    <v-autocomplete v-model="cashAdvance" :items="cashAdvanceList" item-title="cash_advance_amount"
+                      variant="solo-filled" flat item-value="documentId" label="Select Cash Advance" return-object
+                      required>
+                    </v-autocomplete>
+                  </v-col>
+                  <v-col cols="12" md="4" v-show="showCashAdvanceDeduction">
                     <v-text-field label="Cash Advance Deduction" variant="solo-filled" flat type="number"
                       v-model="cashAdvanceDeduction" />
                   </v-col>
@@ -463,6 +469,10 @@ const pagibig = ref(0)
 const withHoldingTax = ref(0)
 const sssLoan = ref(0)
 const pagibigLoan = ref(0)
+const showCashAdvanceDeduction = ref(false)
+const cashAdvanceList = ref([])
+const cashAdvance = ref(null)
+const selectedCashAdvanceId = ref(null);
 const cashAdvanceAmount = ref(0)
 const cashAdvanceBalance = ref(0)
 const originalCashAdvanceBalance = ref(0)
@@ -500,7 +510,7 @@ const fetchPayroll = async () => {
 // }
 
 const fetchEmployee = async () => {
-  const res = await $fetch(`${baseUrl}/api/employees`);
+  const res = await $fetch(`${baseUrl}/api/employees?populate=*`);
   employees.value = res.data
 }
 
@@ -569,11 +579,16 @@ const resetFormCreateEmployee = async () => {
   withHoldingTax.value = 0
   sssLoan.value = 0
   pagibigLoan.value = 0
+  healthCard.value = 0
+  showCashAdvanceDeduction.value = false
+  cashAdvanceList.value = []
+  cashAdvance.value = null
   cashAdvanceAmount.value = 0
   cashAdvanceBalance.value = 0
   cashAdvanceDeduction.value = 0
-  healthCard.value = 0
+  originalCashAdvanceBalance.value = 0
 }
+
 
 const submitForm = async () => {
   const isValid = await payrollEnlistmentForm.value?.validate();
@@ -612,9 +627,23 @@ const submitForm = async () => {
       console.log("Submitted: ", payload)
       //console.log("Employee: ", employee.value)
 
-      await $fetch(`${baseUrl}/api/payslips`, {
+      console.log("Processing payslip..")
+      const payslip = await $fetch(`${baseUrl}/api/payslips`, {
         method: 'POST',
         body: payload,
+      })
+
+      console.log("Processing cash advance..")
+      const cashAdvance = await $fetch(`${baseUrl}/api/cash-advance-payments`, {
+        method: 'POST',
+        body: {
+          data: {
+            cash_advance: selectedCashAdvanceId.value,
+            cash_advance_payment: cashAdvanceDeduction.value,
+            payment_date: new Date().toISOString().split('T')[0],
+            payroll_period: route.params.id
+          }
+        }
       })
 
       // await $fetch(`${baseUrl}/api/employees/${employee.value?.documentId}`, {
@@ -625,9 +654,10 @@ const submitForm = async () => {
       //     }
       //   }
       // })
-      
+
       console.log("Cash Advance New Balance: ", cashAdvanceBalance.value)
       console.log("Employee:", employee.value?.documentId)
+      console.log('Cash Advance', cashAdvance)
 
       alert(`Payroll for ${employee.value?.employee_name} successfully created `)
       payrollEnlistmentForm.value?.reset()
@@ -712,6 +742,7 @@ onMounted(async () => {
 
 watch(employee, () => {
   if (employee.value) {
+    console.log('Selected Employee: ', employee.value)
     employeeName.value = employee.value?.employee_name
     position.value = employee.value?.position
     department.value = employee.value?.department
@@ -722,16 +753,35 @@ watch(employee, () => {
     sss.value = employee.value?.sss
     philhealth.value = employee.value?.philhealth
     pagibig.value = employee.value?.pagibig
-    cashAdvanceAmount.value = employee.value?.cash_advance_amount
-    cashAdvanceBalance.value = employee.value?.cash_advance_balance
+    cashAdvanceList.value = employee.value?.cash_advances
+    //cashAdvanceAmount.value = employee.value?.cash_advance_amount
+    //cashAdvanceBalance.value = employee.value?.cash_advance_balance
 
   }
-  originalCashAdvanceBalance.value = Number(
-    employee.value.cash_advance_balance || 0
-  )
 
-  cashAdvanceBalance.value = originalCashAdvanceBalance.value
-  cashAdvanceDeduction.value = 0;
+
+  // cashAdvanceBalance.value = originalCashAdvanceBalance.value
+  // cashAdvanceDeduction.value = 0;
+})
+
+watch(cashAdvance, () => {
+  console.log('Selected Cash Advance: ', cashAdvance.value)
+
+  if (cashAdvance.value == null) {
+    showCashAdvanceDeduction.value = false
+  } else {
+    selectedCashAdvanceId.value = cashAdvance.value.documentId
+    console.log(`Selected Cash Advance ID: `, selectedCashAdvanceId.value)
+    showCashAdvanceDeduction.value = true
+    cashAdvanceAmount.value = cashAdvance.value?.cash_advance_amount || 0
+    cashAdvanceBalance.value = cashAdvance.value?.cash_advance_balance || 0
+
+
+    originalCashAdvanceBalance.value = Number(
+      cashAdvance.value.cash_advance_balance || 0
+    )
+  }
+
 })
 
 watch(cashAdvanceDeduction, (deduction) => {
