@@ -99,7 +99,7 @@ const getPayroll = async () => {
 
     if (res) {
       payroll.value = res.data;
-      console.log("Payroll Period: ", res.data)
+      //console.log("Payroll Period: ", res.data)
       loading.value = false
     }
   } catch (err) {
@@ -117,11 +117,11 @@ const createPayroll = async () => {
 
   try {
       
-    const firstPeriod = payrollPeriod.value[0]
+    const firstPeriod = payrollPeriod.value[1]
     const lastPeriod = payrollPeriod.value[payrollPeriod.value?.length - 1]
     console.log("1st Payroll Period: ", firstPeriod)
     console.log("2nd Payroll Period: ", lastPeriod)
-
+    console.log('Payroll Period: ', payrollPeriod.value)
     loadingBtn.value = true;
 
     const toYMD = (date) => {

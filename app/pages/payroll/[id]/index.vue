@@ -1,97 +1,104 @@
 <template>
   <div>
     <AppBreadcrumb :breadcrumbs="breadcrumbItems" theme="light" class="mb-3" />
-    <v-card elevation="0" rounded="lg" class="mt-5">
-      <v-toolbar color="transparent">
-        <v-toolbar-title><v-icon start>mdi-cash-clock</v-icon> Payroll Details</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <!-- <v-btn class="my-2 mr-2 text-capitalize" :to="`/payroll/${route.params.id}/print`" variant="elevated"
+    <v-card elevation="0" rounded="lg" class="mt-5" v-if="noRecordFound">
+      <h1 class="text-center pa-8">No Record Found</h1>
+    </v-card>
+    <div v-else>
+      <v-card elevation="0" rounded="lg" class="mt-5">
+        <v-toolbar color="transparent">
+          <v-toolbar-title><v-icon start>mdi-cash-clock</v-icon> Payroll Details</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <!-- <v-btn class="my-2 mr-2 text-capitalize" :to="`/payroll/${route.params.id}/print`" variant="elevated"
           elevation="0" prepend-icon="mdi-printer" color="info" target="_blank" rel="noopener noreferrer">Print
           Payroll</v-btn> -->
 
-        <v-btn class="my-2 mr-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-printer"
-          color="info" @click="openPrintWindow">
-          Print Payroll
-        </v-btn>
+          <v-btn class="my-2 mr-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-printer"
+            color="info" @click="openPrintWindow">
+            Print Payroll
+          </v-btn>
 
 
-        <v-btn class="my-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-plus" color="primary"
-          @click="openEmployeeDialog">Add Employee Payroll</v-btn>
+          <v-btn class="my-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-plus" color="primary"
+            @click="openEmployeeDialog">Add Employee Payroll</v-btn>
 
-        <!-- <PayrollEmployeePayrollForm @saved="fetchEmployeePayroll"/> -->
+          <!-- <PayrollEmployeePayrollForm @saved="fetchEmployeePayroll"/> -->
 
-      </v-toolbar>
-      <v-divider></v-divider>
-      <v-card-text>
-        <v-row>
-          <v-col cols="12" md="12">
-            <v-row>
-              <v-col cols="12" md="3">
-                <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                  <v-row dense>
-                    <v-col cols="7" class="font-weight-bold"> Payroll Cover Start:</v-col>
-                    <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_start)
-                    }}</v-col>
-                  </v-row>
-                </v-card>
-              </v-col>
+        </v-toolbar>
+        <v-divider></v-divider>
+        <v-card-text>
+          <v-row>
+            <v-col cols="12" md="12">
+              <v-row>
+                <v-col cols="12" md="3">
+                  <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                    <v-row dense>
+                      <v-col cols="7" class="font-weight-bold"> Payroll Cover Start:</v-col>
+                      <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_start)
+                        }}</v-col>
+                    </v-row>
+                  </v-card>
+                </v-col>
 
-              <v-col cols="12" md="3">
-                <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                  <v-row dense>
-                    <v-col cols="7" class="font-weight-bold"> Payroll Cover End:</v-col>
-                    <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_end)
-                    }}</v-col>
-                  </v-row>
-                </v-card>
-              </v-col>
+                <v-col cols="12" md="3">
+                  <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                    <v-row dense>
+                      <v-col cols="7" class="font-weight-bold"> Payroll Cover End:</v-col>
+                      <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_end)
+                        }}</v-col>
+                    </v-row>
+                  </v-card>
+                </v-col>
 
-              <v-col cols="12" md="3">
-                <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                  <v-row dense>
-                    <v-col cols="7" class="font-weight-bold"> Payroll Created:</v-col>
-                    <v-col cols="5"> {{ formatDate(payrollDetails.createdAt)
-                    }}</v-col>
-                  </v-row>
-                </v-card>
-              </v-col>
+                <v-col cols="12" md="3">
+                  <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                    <v-row dense>
+                      <v-col cols="7" class="font-weight-bold"> Payroll Created:</v-col>
+                      <v-col cols="5"> {{ formatDate(payrollDetails.createdAt)
+                        }}</v-col>
+                    </v-row>
+                  </v-card>
+                </v-col>
 
-              <v-col cols="12" md="3">
-                <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                  <v-row dense>
-                    <v-col cols="7" class="font-weight-bold"> Created By:</v-col>
-                    <v-col cols="5"> </v-col>
-                  </v-row>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
+                <v-col cols="12" md="3">
+                  <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                    <v-row dense>
+                      <v-col cols="7" class="font-weight-bold"> Created By:</v-col>
+                      <v-col cols="5"> </v-col>
+                    </v-row>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
 
-    <v-card elevation="0" rounded="lg" class="mt-5">
-      <v-card-title class="d-flex align-center pe-2">
-        Grand Total: {{ formatCurrency(totalNetPay) }}
-        <v-spacer></v-spacer>
-        <v-spacer></v-spacer>
-        <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
-          variant="solo-filled" flat hide-details single-line></v-text-field>
-      </v-card-title>
-      <v-divider></v-divider>
-      <v-card-text>
-        <v-data-table density="compact" :items-per-page="-1" :hide-default-footer="true" :headers="header"
-          :items="payrollDetails.payslips" :search="search" :loading="loading">
-          <template v-slot:[`item.actions`]="{ item }">
-            <!-- <v-btn size="small" class="mr-1" icon="mdi-account-cog-outline" variant="tonal" color="blue"
+      <v-card elevation="0" rounded="lg" class="mt-5">
+        <v-card-title class="d-flex align-center pe-2">
+          Grand Total: {{ formatCurrency(totalNetPay) }}
+          <v-spacer></v-spacer>
+          <v-spacer></v-spacer>
+          <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
+            variant="solo-filled" flat hide-details single-line></v-text-field>
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-card-text>
+          <v-data-table density="compact" :items-per-page="-1" :hide-default-footer="true" :headers="header"
+            :items="payrollDetails.payslips" :search="search" :loading="loading">
+            <template v-slot:[`item.actions`]="{ item }">
+              <!-- <v-btn size="small" class="mr-1" icon="mdi-account-cog-outline" variant="tonal" color="blue"
               :to="`/employees/${item.documentId}`"></v-btn> -->
-            <v-btn size="small" class="mr-1" variant="tonal" color="info" @click="openPayrollDialog(item)"><v-icon
-                start>mdi-account-cog-outline</v-icon> Manage</v-btn>
+              <v-btn size="small" class="mr-1" variant="tonal" color="info"
+                :to="`/payroll/${route.params.id}/manage/${item.documentId}`"><v-icon
+                  start>mdi-account-cog-outline</v-icon> Manage</v-btn>
 
-          </template>
-        </v-data-table>
-      </v-card-text>
-    </v-card>
+            </template>
+          </v-data-table>
+        </v-card-text>
+      </v-card>
+
+    </div>
 
     <!-- <PayslipPrint :payslip="payrollDetails.payslips" /> -->
 
@@ -115,7 +122,7 @@
 
           <h3 class="text-center">Payroll Period</h3>
           <h4 class="text-center">{{ formatDate(payrollDetails.payroll_period_start)
-            }} - {{ formatDate(payrollDetails.payroll_period_end)
+          }} - {{ formatDate(payrollDetails.payroll_period_end)
             }}</h4>
 
 
@@ -441,6 +448,7 @@ const header = [
   // { title: 'Rate per hour', key: 'rate_per_hour', sortable: false },
   { title: 'Actions', key: 'actions', align: 'end', sortable: false },
 ];
+const noRecordFound = ref(true)
 const search = ref('')
 const loading = ref(true)
 const payrollEnlistmentForm = ref(null)
@@ -480,6 +488,8 @@ const cashAdvanceDeduction = ref(0)
 const healthCard = ref(0)
 //const netPay = ref(0)
 
+const payslipId = ref(null)
+
 const rules = {
   general: (v) => !!v || "This field is required"
 }
@@ -493,12 +503,11 @@ const openEmployeeDialog = async () => {
 
 
 const fetchPayroll = async () => {
-  const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?populate[payslips][populate]=*`, {
-
-  })
+  const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?populate[payslips][populate]=*`)
   loading.value = false
   payrollDetails.value = res.data;
-  console.log('Payroll Details:', res.data)
+  noRecordFound.value = false
+  //console.log('Payroll Details:', res.data)
 }
 
 // const fetchPayslips = async () => {
@@ -624,22 +633,28 @@ const submitForm = async () => {
       }
 
       // const cashAdvanceNewBalance = Number(cashAdvanceAmount.value) - Number(cashAdvanceDeduction.value)
-      console.log("Submitted: ", payload)
+      //console.log("Submitted: ", payload)
       //console.log("Employee: ", employee.value)
 
-      console.log("Processing payslip..")
+      // STEP 1: Creating Payslip
+      //console.log("Processing payslip..")
       const payslip = await $fetch(`${baseUrl}/api/payslips`, {
         method: 'POST',
         body: payload,
       })
+      
+      payslipId.value = payslip.data.documentId
+      
 
-      console.log("Processing cash advance..")
-      const cashAdvance = await $fetch(`${baseUrl}/api/cash-advance-payments`, {
+      // STEP 2: Processing Cash Advance
+      //console.log("Processing cash advance..", payslipId.value)
+      await $fetch(`${baseUrl}/api/cash-advance-payments`, {
         method: 'POST',
         body: {
           data: {
             cash_advance: selectedCashAdvanceId.value,
             cash_advance_payment: cashAdvanceDeduction.value,
+            payslips: payslip.data.id,
             payment_date: new Date().toISOString().split('T')[0],
             payroll_period: route.params.id
           }
@@ -655,9 +670,9 @@ const submitForm = async () => {
       //   }
       // })
 
-      console.log("Cash Advance New Balance: ", cashAdvanceBalance.value)
-      console.log("Employee:", employee.value?.documentId)
-      console.log('Cash Advance', cashAdvance)
+      //console.log("Cash Advance New Balance: ", cashAdvanceBalance.value)
+      //console.log("Employee:", employee.value?.documentId)
+      //console.log('Cash Advance', cashAdvance)
 
       alert(`Payroll for ${employee.value?.employee_name} successfully created `)
       payrollEnlistmentForm.value?.reset()
@@ -668,6 +683,17 @@ const submitForm = async () => {
     } catch (err) {
       const message = err?.response?._data?.error?.message || "Unknown error";
       console.log("Error message: ", message)
+      // Rollback payslip if step 2 failed
+      if (payslipId.value) {
+        try {
+          await $fetch(`${baseUrl}/api/payslips/${payslipId.value}`, {
+            method: 'DELETE'
+          })
+          console.warn('Payslip rolled back')
+        } catch (rollbackError) {
+          console.error('Rollback failed:', rollbackError)
+        }
+      }
       alert(message)
     }
 
@@ -765,13 +791,13 @@ watch(employee, () => {
 })
 
 watch(cashAdvance, () => {
-  console.log('Selected Cash Advance: ', cashAdvance.value)
+  //console.log('Selected Cash Advance: ', cashAdvance.value)
 
   if (cashAdvance.value == null) {
     showCashAdvanceDeduction.value = false
   } else {
     selectedCashAdvanceId.value = cashAdvance.value.documentId
-    console.log(`Selected Cash Advance ID: `, selectedCashAdvanceId.value)
+    //console.log(`Selected Cash Advance ID: `, selectedCashAdvanceId.value)
     showCashAdvanceDeduction.value = true
     cashAdvanceAmount.value = cashAdvance.value?.cash_advance_amount || 0
     cashAdvanceBalance.value = cashAdvance.value?.cash_advance_balance || 0
