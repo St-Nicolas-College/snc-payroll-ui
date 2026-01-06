@@ -9,7 +9,7 @@
 
         <h2 class="text-center font-weight-bold mb-6">Welcome Back!</h2>
 
-        <v-form v-model="valid" ref="loginForm" lazy-validation @submit.prevent="handleLogin">
+        <v-form v-model="valid" ref="loginForm" lazy-validation @submit.prevent="submit">
           <v-text-field v-model="user.identifier" label=" Username" :rules="[rules.required]"
             prepend-inner-icon="mdi-account-outline" variant="outlined" class="mb-4" hide-details="auto" dense />
 
@@ -67,12 +67,16 @@ useHead({
   title: "Log In",
 });
 const router = useRouter();
+const { login, fetchUser } = useMyAuthStore()
+const { authenticated } = storeToRefs(useMyAuthStore())
+const { errorLogin } = storeToRefs(useMyAuthStore())
+const { errorMessage } = storeToRefs(useMyAuthStore())
 
 
 //Major: Breaking changes
 //Minor: New Features, backward compatible
 //Patch: Bug fixes only
-const version = ref("1.12.1") //Major.Minor.Patch
+const version = ref("1.10.0") //Major.Minor.Patch
 const username = ref("");
 const password = ref("");
 const user = ref({
@@ -83,11 +87,10 @@ const valid = ref(true);
 const showPassword = ref(false);
 const loginForm = ref(null);
 const loading = ref(false);
+const error = ref('')
 const snackbar = ref(false);
 const text = ref("");
 
-// const auth = useAuthStore();
-// const router = useRouter();
 
 const rules = {
   required: (v) => !!v || "This field is required",
@@ -99,42 +102,68 @@ const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
 };
 
-// const handleLogin = async () => {
-//   if (!formIsValid.value) return;
-
-//   try {
-
-//   } catch (err) {
-//     alert("Login failed");
-//   }
-// };
-async function handleLogin() {
-  console.log("Logging in....")
-  const { valid, errors } = await loginForm.value?.validate();
-  loading.value = true;
-  console.log("form is valid: ", valid)
+const submit = async () => {
+  const { valid, errors } = await loginForm.value?.validate()
+  loading.value = true
+  error.value = ''
 
   if (valid) {
-    await authenticateUser(user.value);
-    if (authenticated.value == true) {
-      lastLoggedIn()
-      fetchUser()
-      //userData.value = fetchUser()
-      loading.value = false;
-      router.push('/')
-    }
-    if (errorLogin.value == true) {
-      loading.value = false;
-      snackbar.value = true;
-      text.value = errorMessage.value;
-      console.log("Error login: ", errorMessage.value)
 
-      //alert("Login failed: " + errorMessage.value);
+    console.log("Logging in...")
+    try {
+      await login(user.value)
+      if (authenticated.value == true) {
+        fetchUser();
+        //navigateTo(redirectByRole(auth.role))
+        loading.value = false
+        router.push('/')
+      }
+
+      if (errorLogin.value == true) {
+        loading.value = false;
+        snackbar.value = true;
+        text.value = errorMessage.value;
+        console.log("Error login: ", errorMessage.value)
+      }
+    } catch (err) {
+      console.log(err)
+      loading.value = false;
     }
+
   } else {
     loading.value = false;
   }
+
+
 }
+
+// async function handleLogin() {
+//   console.log("Logging in....")
+//   const { valid, errors } = await loginForm.value?.validate();
+//   loading.value = true;
+//   console.log("form is valid: ", valid)
+
+//   if (valid) {
+//     await authenticateUser(user.value);
+//     if (authenticated.value == true) {
+//       lastLoggedIn()
+//       fetchUser()
+//       //userData.value = fetchUser()
+//       loading.value = false;
+//       router.push('/')
+//     }
+//     if (errorLogin.value == true) {
+//       loading.value = false;
+//       snackbar.value = true;
+//       text.value = errorMessage.value;
+//       console.log("Error login: ", errorMessage.value)
+
+//       //alert("Login failed: " + errorMessage.value);
+//     }
+//   } else {
+//     loading.value = false;
+//   }
+// }
 </script>
 
 <style scoped>

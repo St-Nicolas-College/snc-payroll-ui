@@ -166,7 +166,15 @@
 </template>
 
 <script setup>
+  useHead({
+  title: 'Employees',
+
+})
 const baseUrl = useRuntimeConfig().public.strapiUrl
+definePageMeta({
+  middleware: 'role-check',
+  allowedRoles: ['Staff']
+})
 const breadcrumbItems = [
   { text: 'Dashboard', to: '/', icon: 'mdi-home-outline' },
   { text: 'Employee Management' },

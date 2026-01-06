@@ -64,6 +64,14 @@
 </template>
 
 <script setup>
+definePageMeta({
+  middleware: 'role-check',
+  allowedRoles: ['Staff']
+})
+useHead({
+  title: 'Payroll',
+
+})
 const baseUrl = useRuntimeConfig().public.strapiUrl
 const breadcrumbItems = [
   { text: 'Dashboard', to: '/', icon: 'mdi-home-outline' },

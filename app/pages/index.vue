@@ -6,8 +6,11 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script setup>
+useHead({
+  title: 'Dashboard',
 
+})
 </script>
 
 <style>

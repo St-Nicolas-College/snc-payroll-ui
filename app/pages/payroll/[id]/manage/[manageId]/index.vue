@@ -312,6 +312,10 @@
 </template>
 
 <script setup>
+  useHead({
+  title: 'Payroll',
+
+})
 const baseUrl = useRuntimeConfig().public.strapiUrl
 const route = useRoute();
 const payrollId = route.params.id

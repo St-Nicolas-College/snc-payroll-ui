@@ -6,6 +6,10 @@
 </template>
 
 <script setup>
+  useHead({
+  title: 'Manage',
+
+})
 const breadcrumbItems = [
   { text: 'Dashboard', to: '/', icon: 'mdi-home-outline' },
   { text: 'Payroll Management', to: '/payroll' },

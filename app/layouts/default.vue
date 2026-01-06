@@ -7,14 +7,18 @@
         </div>
         <v-divider></v-divider>
         <v-list density="compact" nav>
-          <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard" value="dashboard" :to="'/'" class="mb-2"
+          <!-- <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard" value="dashboard" :to="'/'" class="mb-2"
             active-class="v-list-item--active-custom">
           </v-list-item>
           <v-list-item prepend-icon="mdi-cash-sync" title="Payroll" value="payroll" :to="'/payroll'"
             :active="$route.path.startsWith('/payroll')" class="mb-2" active-class="v-list-item--active-custom">
           </v-list-item>
           <v-list-item prepend-icon="mdi-account-group" title="Employees" value="employees" to="/employees"
-            active-class="v-list-item--active-custom" :active="$route.path.startsWith('/employees')"></v-list-item>
+            active-class="v-list-item--active-custom" :active="$route.path.startsWith('/employees')"></v-list-item> -->
+
+            <v-list-item v-for="link in visibleLinks" :key="link.title" :to="link.to" :prepend-icon="link.icon" :title="link.title" active-class="v-list-item--active-custom">
+
+            </v-list-item>
         </v-list>
 
         <template v-slot:append v-if="drawer">
@@ -122,10 +126,37 @@
 
 <script setup>
 import { useTheme } from "vuetify";
+const { logUserOut } = useMyAuthStore()
+const userStore = useMyAuthStore();
+const links = [
+  {
+    title: "Dashboard",
+    to: '/',
+    icon: "mdi-view-dashboard",
+    roles: ["Staff"]
+  },
+  {
+    title: "Payroll",
+    to: '/payroll',
+    icon: "mdi-cash-sync",
+    roles: ["Staff"]
+  },
+  {
+    title: "Employees",
+    to: '/employees',
+    icon: "mdi-account-group",
+    roles: ["Staff"]
+  }
+]
+
 const drawer = ref(true);
 const theme = useTheme();
 //theme.global.name.value = "light";
 theme.change('light')
+
+const visibleLinks = computed(() => {
+  return links.filter((link) => link.roles.includes(userStore.role))
+})
 
 // Function to toggle between dark and light themes
 function toggleTheme() {
@@ -134,6 +165,12 @@ function toggleTheme() {
   const isDark = theme.global.current.value.dark
   theme.change(isDark ? 'light' : 'dark')
 }
+
+const handleLogout = () => {
+  logUserOut();
+  //router.push("/auth/login")
+  window.location.href = "/auth/login";
+};
 </script>
 
 <style>

@@ -154,6 +154,10 @@
 <script setup>
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
+useHead({
+  title: 'Print',
+
+})
 const loading = ref(true)
 const disabledBtn = ref(true)
 const noData = ref(false)
