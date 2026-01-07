@@ -1,5 +1,6 @@
 <template>
   <div>
+    <v-pull-to-refresh @load="onRefresh">
     <AppBreadcrumb :breadcrumbs="breadcrumbItems" theme="light" class="mb-3" />
     <v-card elevation="0" rounded="lg" class="mt-5" v-if="noRecordFound">
       <h1 class="text-center pa-8">No Record Found</h1>
@@ -412,6 +413,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    </v-pull-to-refresh>
   </div>
 </template>
 
@@ -733,6 +735,19 @@ const submitForm = async () => {
 
   }
 
+}
+
+const onRefresh = async ({ done }) => {
+  try {
+    //1. Refresh all useFetch on the page
+    await fetchPayroll()
+
+    //2. Manual delay to let the animation finish smoothly
+    await new Promise(resolve => setTimeout(resolve, 500))
+  } finally {
+    //3. Crucial: Call done() to hide the loading indicator
+    done()
+  }
 }
 
 

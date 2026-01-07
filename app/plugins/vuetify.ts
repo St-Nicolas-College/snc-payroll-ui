@@ -3,11 +3,13 @@ import "vuetify/styles";
 import { createVuetify } from "vuetify";
 import * as directives from "vuetify/directives";
 import { VDateInput } from 'vuetify/labs/VDateInput'
+import { VPullToRefresh } from "vuetify/labs/VPullToRefresh";
 
 export default defineNuxtPlugin((nuxtApp) => {
   const vuetify = createVuetify({
      components: {
     VDateInput,
+    VPullToRefresh,
   },
     theme: {
       themes: {
