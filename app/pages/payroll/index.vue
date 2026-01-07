@@ -1,7 +1,7 @@
 <template>
   <div>
     <AppBreadcrumb :breadcrumbs="breadcrumbItems" theme="light" class="mb-3" />
-    <v-card elevation="0" rounded="lg" class="mt-5">
+    <v-card elevation="0" rounded="lg" class="mt-5 d-none d-md-block">
       <v-toolbar color="transparent">
         <v-toolbar-title><v-icon start>mdi-cash-clock</v-icon> Payroll Management</v-toolbar-title>
       </v-toolbar>
@@ -18,7 +18,7 @@
 
       </v-card-title>
       <v-divider></v-divider>
-      <v-data-table density="compact" :headers="header" :items="payroll" :search="search" :loading="loading"
+      <v-data-table density="compact" :headers="header" :items="payrolls" :search="search" :loading="loading"
         show-select>
 
         <template v-slot:[`item.payroll_period`]="{ item }">
@@ -38,6 +38,39 @@
       </v-data-table>
     </v-card>
 
+    <v-card elevation="0" rounded="lg" class="mt-5 d-md-none">
+      <v-toolbar color="transparent">
+        <v-toolbar-title><v-icon start>mdi-cash-clock</v-icon> Payroll Management</v-toolbar-title>
+      </v-toolbar>
+      <v-divider></v-divider>
+     
+      <v-card-text>
+        <div v-for="payroll in payrolls" :key="payroll.id" class="mt-2">
+          <v-row dense>
+            <v-col cols="10">
+              <v-row no-gutters>
+                <v-col cols="12">
+                  {{ formatDate(payroll.payroll_period_start) }} - {{ formatDate(payroll.payroll_period_end) }}
+                </v-col>
+                <v-col cols="12" class="text-medium-emphasis text-color-grey">
+                  Created by:
+                </v-col>
+
+              </v-row>
+            </v-col>
+            <v-col cols="2" class="text-right">
+              <v-btn icon="mdi-open-in-new" :to="`/payroll/${payroll.documentId}`" variant="text" color="info"></v-btn>
+            </v-col>
+          </v-row>
+          <v-divider></v-divider>
+        </div>
+      </v-card-text>
+    </v-card>
+
+    <v-fab class="d-md-none" location="right bottom" size="large" app="fixed" color="primary"  @click="createPayrollDialog = true" icon>
+      <v-icon>mdi-plus</v-icon>
+    </v-fab>
+
     <v-dialog v-model="createPayrollDialog" width="500">
       <v-card>
         <v-toolbar><v-toolbar-title>
@@ -48,8 +81,9 @@
         </v-toolbar>
         <v-card-text>
           <v-form ref="createPayrollForm" v-model="formValid" class="mt-2" @submit.prevent="createPayroll">
-            <v-date-input prepend-icon="" input-mode="calendar" prepend-inner-icon="mdi-calendar-range" :rules="[rules.payrollPeriod]"
-              variant="solo-filled" flat v-model="payrollPeriod" :model-modifiers="{ time: false}" label="Payroll Period" multiple="range"></v-date-input>
+            <v-date-input prepend-icon="" input-mode="calendar" prepend-inner-icon="mdi-calendar-range"
+              :rules="[rules.payrollPeriod]" variant="solo-filled" flat v-model="payrollPeriod"
+              :model-modifiers="{ time: false }" label="Payroll Period" multiple="range"></v-date-input>
             <v-btn class="mt-2" :loading="loadingBtn" :disabled="loadingBtn" block color="primary" type="submit">Create
               Payroll</v-btn>
           </v-form>
@@ -64,6 +98,7 @@
 </template>
 
 <script setup>
+const token = useCookie('token')
 definePageMeta({
   middleware: 'role-check',
   allowedRoles: ['Staff']
@@ -86,7 +121,7 @@ const header = [
 
 const formValid = ref(true)
 const loadingBtn = ref(false)
-const payroll = ref([])
+const payrolls = ref([])
 const search = ref('')
 const loading = ref(true)
 const createPayrollDialog = ref(false);
@@ -103,10 +138,14 @@ onMounted(async () => {
 
 const getPayroll = async () => {
   try {
-    const res = await $fetch(`${baseUrl}/api/payroll-periods?populate=*`)
+    const res = await $fetch(`${baseUrl}/api/payroll-periods?populate=*`, {
+      headers: {
+        Authorization: `Bearer ${token.value}`
+      },
+    })
 
     if (res) {
-      payroll.value = res.data;
+      payrolls.value = res.data;
       //console.log("Payroll Period: ", res.data)
       loading.value = false
     }
@@ -124,7 +163,7 @@ const createPayroll = async () => {
 
 
   try {
-      
+
     const firstPeriod = payrollPeriod.value[1]
     const lastPeriod = payrollPeriod.value[payrollPeriod.value?.length - 1]
     console.log("1st Payroll Period: ", firstPeriod)
@@ -138,6 +177,9 @@ const createPayroll = async () => {
     }
     await $fetch(`${baseUrl}/api/payroll-periods`, {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token.value}`
+      },
       body: {
         data: {
           payroll_period_start: firstPeriod,

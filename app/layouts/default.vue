@@ -26,7 +26,7 @@
           <v-card class="mx-3 pa-2" color="transparent" flat>
             <v-row align="center" dense>
               <v-col cols="auto">
-                <v-avatar size="40" color="purple">
+                <v-avatar size="40" color="primary">
                   <span>AG</span>
                 </v-avatar>
               </v-col>
@@ -74,27 +74,10 @@
         }}</v-icon>
       </v-btn>
 
-      <v-btn icon class="ml-2">
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-
       <v-menu offset-y>
         <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props" class="ml-2">
-            <v-icon>mdi-bell-outline</v-icon>
-          </v-btn>
-        </template>
-        <v-list>
-          <v-list-item>
-            <v-list-item-title>No new notifications</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-
-      <v-menu offset-y>
-        <template v-slot:activator="{ props }">
-          <v-btn icon v-bind="props" class="ml-2">
-            <v-avatar size="40" color="purple">
+            <v-avatar size="40" color="primary">
               <span>AG</span>
               <!-- <v-img
                 src="https://avatars.githubusercontent.com/u/9064066?v=4"

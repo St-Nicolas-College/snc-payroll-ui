@@ -130,7 +130,7 @@
 
                 <v-divider class="mt-2"></v-divider>
                 <v-row no-gutters class="my-2">
-                  <v-col cols="3" class="font-weight-bold">Gross Pay</v-col>
+                  <v-col cols="5" md="3" class="font-weight-bold">Gross Pay</v-col>
                   <v-col cols="1">:</v-col>
                   <v-col cols="6" class="font-weight-bold">
                     {{ formatCurrency(payslipDetails.gross_pay) }}
@@ -177,7 +177,7 @@
 
                 <v-divider class="mt-2"></v-divider>
                 <v-row no-gutters class="my-2">
-                  <v-col cols="3" class="font-weight-bold">Net Gross Pay</v-col>
+                  <v-col cols="5" md="3" class="font-weight-bold">Net Gross Pay</v-col>
                   <v-col cols="1">:</v-col>
                   <v-col cols="6" class="font-weight-bold">
                     {{ formatCurrency(payslipDetails.net_gross_pay) }}
@@ -258,9 +258,9 @@
 
                 <v-divider class="mt-2"></v-divider>
                 <v-row no-gutters class="my-2">
-                  <v-col cols="3" class="font-weight-bold text-h6">Total Net Pay</v-col>
+                  <v-col cols="5" md="3" class="font-weight-bold total-netpay">Total Net Pay</v-col>
                   <v-col cols="1">:</v-col>
-                  <v-col cols="6" class="font-weight-bold text-h6">
+                  <v-col cols="6" md="6" class="font-weight-bold total-netpay">
                     {{ formatCurrency(payslipDetails.net_pay) }}
                   </v-col>
                 </v-row>
@@ -316,6 +316,7 @@
   title: 'Payroll',
 
 })
+const token = useCookie('token')
 const baseUrl = useRuntimeConfig().public.strapiUrl
 const route = useRoute();
 const payrollId = route.params.id
@@ -368,7 +369,11 @@ const rules = {
 
 
 const fetchPayslipDetails = async () => {
-  const res = await $fetch(`${baseUrl}/api/payslips/${manageId}?populate=*`)
+  const res = await $fetch(`${baseUrl}/api/payslips/${manageId}?populate=*`, {
+    headers: {
+              Authorization: `Bearer ${token.value}`
+            },
+  })
   // loading.value = false
   // payrollDetails.value = res.data;
   // noRecordFound.value = false
@@ -388,11 +393,17 @@ const deletePayslipDetails = async () => {
   try {
     const [payslip, cashAdvance] = await Promise.all([
       $fetch(`${baseUrl}/api/payslips/${manageId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+              Authorization: `Bearer ${token.value}`
+            },
       }),
 
       $fetch(`${baseUrl}/api/cash-advance-payments/${cashAdvanceId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+              Authorization: `Bearer ${token.value}`
+            },
       })
     ])
     
@@ -456,5 +467,9 @@ onMounted(async () => {
   /* background: linear-gradient(90deg, #6366f1, #8b5cf6); Default info gradient */
   /* background: linear-gradient(90deg, #16a34a, #22c55e); success */
   background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+.total-netpay {
+  font-size: 2vh;
+  text-transform: uppercase;
 }
 </style>

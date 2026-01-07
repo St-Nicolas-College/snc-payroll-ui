@@ -1,21 +1,23 @@
 <template>
   <v-app>
     <div class="login-wrapper d-flex align-center justify-center fill-height">
-      <v-card class="pa-8 rounded-lg" width="400" elevation="10">
+
+
+      <v-card class="pa-8 rounded-lg" color="transparent" width="400" elevation="0">
         <!-- Logo -->
         <div class="text-center mb-4">
-          <v-img src="/SNC-Logo.png" alt="Logo" max-width="80" class="mx-auto" contain />
+          <v-img src="/SNC-Logo.png" alt="Logo" max-width="100" class="mx-auto" contain />
         </div>
 
         <h2 class="text-center font-weight-bold mb-6">Welcome Back!</h2>
 
         <v-form v-model="valid" ref="loginForm" lazy-validation @submit.prevent="submit">
           <v-text-field v-model="user.identifier" label=" Username" :rules="[rules.required]"
-            prepend-inner-icon="mdi-account-outline" variant="outlined" class="mb-4" hide-details="auto" dense />
+            prepend-inner-icon="mdi-account-outline" bg-color="white" variant="solo-filled" rounded="xl" flat class="mb-4" hide-details="auto" dense />
 
           <v-text-field v-model="user.password" label="Password" :type="showPassword ? 'text' : 'password'"
             :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" @click:append-inner="togglePasswordVisibility"
-            :rules="[rules.required]" prepend-inner-icon="mdi-lock-outline" variant="outlined" class="mb-2"
+            :rules="[rules.required]" prepend-inner-icon="mdi-lock-outline" bg-color="white" rounded="xl" variant="solo-filled" flat class="mb-2"
             hide-details="auto" dense />
 
           <div class="d-flex justify-end mb-4">
@@ -24,8 +26,8 @@
             </NuxtLink>
           </div>
 
-          <v-btn :loading="loading" :disabled="loading" type="submit" color="green-darken-2"
-            class="text-capitalize text-white rounded-lg shadow-md transform hover:-translate-y-0.5 mb-4" block
+          <v-btn :loading="loading" :disabled="loading" type="submit" rounded="xl"
+            class="text-capitalize rounded-lg shadow-md transform hover:-translate-y-0.5 mb-4" color="green" block
             height="45">
             Sign in
           </v-btn>
@@ -39,7 +41,8 @@
 
       </v-card>
 
-      <v-footer app height="32" class="d-flex align-center justify-center text-white"
+
+      <v-footer app height="32" class="d-flex align-center justify-center text-grey"
         style="background: transparent; position: fixed; bottom: 0; left: 0; width: 100%;">
         <small>Version {{ version }}</small>
       </v-footer>
@@ -76,7 +79,7 @@ const { errorMessage } = storeToRefs(useMyAuthStore())
 //Major: Breaking changes
 //Minor: New Features, backward compatible
 //Patch: Bug fixes only
-const version = ref("1.10.0") //Major.Minor.Patch
+const version = ref("1.12.0") //Major.Minor.Patch
 const username = ref("");
 const password = ref("");
 const user = ref({
@@ -175,9 +178,11 @@ body {
 
 .login-wrapper {
   /* background: linear-gradient(135deg, #3b82f6, #8b5cf6);  */
-  background: linear-gradient(135deg,
+  /* background: linear-gradient(135deg,
       #22c55e,
-      #34b864);
+      #34b864); */
   /* Light Green to Dark Green */
+/* background: linear-gradient(180deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%); */
+background: #E0E0E0;
 }
 </style>

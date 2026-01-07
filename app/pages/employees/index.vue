@@ -26,7 +26,7 @@
             :to="`/employees/${item.documentId}`"></v-btn> -->
           <!-- <v-btn size="small" class="mr-1" icon="mdi-account-cog-outline" variant="tonal" color="primary"
             @click="openPayrollDialog(item)"></v-btn> -->
-          <v-btn size="small" class="mr-1" variant="tonal" color="info" @click="openPayrollDialog(item)"><v-icon
+          <v-btn size="small" class="mr-1" variant="tonal" color="info" :to="`/employees/${item.documentId}`"><v-icon
               start>mdi-account-cog-outline</v-icon> Manage</v-btn>
           <v-btn size="small" variant="tonal" color="red" @click="deleteItem(item.documentId)">
             <v-icon>mdi-delete</v-icon> Delete
@@ -109,57 +109,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="createPayrollDialog" width="900">
-      <v-card class="pa-4">
-        <v-row dense>
-          <v-col cols="12">
-            <!-- <v-text-field label="Payroll Period" v-model="form.payroll_period" /> -->
-            <v-select v-model="form.payroll_period" :items="payroll" item-title="documentId" item-value="id"
-              label="Payroll Period" return-object required>
-              <template v-slot:item="{ props: itemProps, item }">
-                <!-- <v-list-item v-bind="itemProps" :subtitle="item.raw.payroll_period_start"></v-list-item> -->
-                <v-list-item v-bind="itemProps">
-                  <v-list-item-subtitle>{{ item.raw.payroll_period_start }} - {{ item.raw.payroll_period_end
-                  }}</v-list-item-subtitle>
-                </v-list-item>
-              </template>
-            </v-select>
-          </v-col>
-          <v-col cols="12">
-            <v-text-field label="Employee ID" v-model="form.employee" />
-          </v-col>
-          <v-divider class="my-2" />
-          <v-col cols="3" v-for="field in [
-            'basic_pay', 'honorarium', 'premium', 'extra_loads',
-            'overtime', 'late_deduction'
-          ]" :key="field">
-            <v-text-field type="number" :label="field" v-model.number="form[field]" />
-          </v-col>
-          <v-col cols="12">
-            <v-text-field label="Gross Pay" v-model="form.gross_pay" readonly />
-          </v-col>
-          <v-divider class="my-2" />
-          <v-col cols="3" v-for="field in ['sss', 'philhealth', 'pagibig']" :key="field">
-            <v-text-field type="number" :label="field" v-model.number="form[field]" />
-          </v-col>
-          <v-col cols="12">
-            <v-text-field label="Net Gross Pay" v-model="form.net_gross_pay" readonly />
-          </v-col>
-          <v-divider class="my-2" />
-          <v-col cols="3" v-for="field in [
-            'withholding_tax', 'sss_loan', 'pagibig_loan', 'cash_advance', 'health_card'
-          ]" :key="field">
-            <v-text-field type="number" :label="field" v-model.number="form[field]" />
-          </v-col>
-          <v-col cols="12">
-            <v-text-field label="Net Pay" v-model="form.net_pay" readonly />
-          </v-col>
-          <v-col cols="12">
-            <v-btn color="primary" @click="submitForm">Save Payslip</v-btn>
-          </v-col>
-        </v-row>
-      </v-card>
-    </v-dialog>
+
 
 
   </div>
@@ -170,6 +120,7 @@
   title: 'Employees',
 
 })
+const token = useCookie('token')
 const baseUrl = useRuntimeConfig().public.strapiUrl
 definePageMeta({
   middleware: 'role-check',
@@ -230,13 +181,21 @@ const openPayrollDialog = async (item) => {
 }
 
 const fetchPayroll = async () => {
-  const res = await $fetch(`${baseUrl}/api/payroll-periods`);
+  const res = await $fetch(`${baseUrl}/api/payroll-periods`, {
+    headers: {
+              Authorization: `Bearer ${token.value}`
+            },
+  });
   payroll.value = res.data
 }
 
 const getUsers = async () => {
   try {
-    const res = await $fetch(`${baseUrl}/api/employees?populate=*`)
+    const res = await $fetch(`${baseUrl}/api/employees?populate=*`, {
+      headers: {
+              Authorization: `Bearer ${token.value}`
+            },
+    })
 
     if (res) {
       employees.value = res.data;
@@ -276,6 +235,9 @@ const createEmployee = async () => {
 
       await $fetch(`${baseUrl}/api/employees`, {
         method: 'POST',
+        headers: {
+              Authorization: `Bearer ${token.value}`
+            },
         body: payload
       })
 
@@ -374,6 +336,9 @@ const submitForm = async () => {
 
   await $fetch(`${baseUrl}/api/payslips`, {
     method: 'POST',
+    headers: {
+              Authorization: `Bearer ${token.value}`
+            },
     body: {
       data: {
         payroll_period: form.value?.payroll_period.documentId,

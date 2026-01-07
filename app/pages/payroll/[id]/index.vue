@@ -6,25 +6,30 @@
     </v-card>
     <div v-else>
       <v-card elevation="0" rounded="lg" class="mt-5">
-        <v-toolbar color="transparent">
-          <v-toolbar-title><v-icon start>mdi-cash-clock</v-icon> Payroll Details</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <!-- <v-btn class="my-2 mr-2 text-capitalize" :to="`/payroll/${route.params.id}/print`" variant="elevated"
-          elevation="0" prepend-icon="mdi-printer" color="info" target="_blank" rel="noopener noreferrer">Print
-          Payroll</v-btn> -->
+        <v-card elevation="0" class="pa-4">
+          <v-row align="center" dense>
+            <!-- LEFT: TITLE -->
+            <v-col cols="12" md="6" class="d-flex align-center">
+              <v-icon start>mdi-cash-clock</v-icon>
+              <span class="text-h6 font-weight-medium">
+                Payroll Details
+              </span>
+            </v-col>
 
-          <v-btn class="my-2 mr-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-printer"
-            color="info" @click="openPrintWindow">
-            Print Payroll
-          </v-btn>
+            <!-- RIGHT: ACTION BUTTONS -->
+            <v-col cols="12" md="6" class="d-flex justify-end" :class="smAndDown ? 'flex-column ga-2' : 'ga-2'">
+              <v-btn color="info" class="text-capitalize" prepend-icon="mdi-printer" :block="smAndDown"
+                @click="openPrintWindow">
+                Print Payroll
+              </v-btn>
 
-
-          <v-btn class="my-2 text-capitalize" variant="elevated" elevation="0" prepend-icon="mdi-plus" color="primary"
-            @click="openEmployeeDialog">Add Employee Payroll</v-btn>
-
-          <!-- <PayrollEmployeePayrollForm @saved="fetchEmployeePayroll"/> -->
-
-        </v-toolbar>
+              <v-btn color="success" class="text-capitalize" prepend-icon="mdi-plus" :block="smAndDown"
+                @click="openEmployeeDialog">
+                Add Employee Payroll
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card>
         <v-divider></v-divider>
         <v-card-text>
           <v-row>
@@ -153,22 +158,22 @@
             <v-row dense>
 
 
-              <v-col cols="6" class="ml-4">
+              <v-col cols="12" md="6" class="ml-4">
 
                 <p class="font-weight-bold mb-4"><v-icon start>mdi-account</v-icon> Employee Information</p>
 
                 <v-row no-gutters>
-                  <v-col cols="3" class="font-weight-bold">Employee Name</v-col>
+                  <v-col cols="5" md="3" class="font-weight-bold">Employee Name</v-col>
                   <v-col cols="1">:</v-col>
                   <v-col cols="6">{{ employeeName }}</v-col>
                 </v-row>
                 <v-row no-gutters>
-                  <v-col cols="3" class="font-weight-bold">Position</v-col>
+                  <v-col cols="5" md="3" class="font-weight-bold">Position</v-col>
                   <v-col cols="1">:</v-col>
                   <v-col cols="6">{{ position }}</v-col>
                 </v-row>
                 <v-row no-gutters>
-                  <v-col cols="3" class="font-weight-bold">Department</v-col>
+                  <v-col cols="5" md="3" class="font-weight-bold">Department</v-col>
                   <v-col cols="1">:</v-col>
                   <v-col cols="6">{{ department }}</v-col>
                 </v-row>
@@ -226,7 +231,7 @@
 
                 <v-divider class="mt-2"></v-divider>
                 <v-row no-gutters class="my-2">
-                  <v-col cols="3" class="font-weight-bold">Gross Pay</v-col>
+                  <v-col cols="5" md="3" class="font-weight-bold">Gross Pay</v-col>
                   <v-col cols="1">:</v-col>
                   <v-col cols="6" class="font-weight-bold">{{ formatCurrency(grossPay) }}</v-col>
                 </v-row>
@@ -263,7 +268,7 @@
 
                 <v-divider class="mt-2"></v-divider>
                 <v-row no-gutters class="my-2">
-                  <v-col cols="3" class="font-weight-bold">Net Gross Pay</v-col>
+                  <v-col cols="5" md="3" class="font-weight-bold">Net Gross Pay</v-col>
                   <v-col cols="1">:</v-col>
                   <v-col cols="6" class="font-weight-bold">{{ formatCurrency(netGrossPay) }}</v-col>
                 </v-row>
@@ -325,15 +330,15 @@
 
                 <v-divider class="mt-2"></v-divider>
                 <v-row no-gutters class="my-2">
-                  <v-col cols="3" class="font-weight-bold text-h6">Total Net Pay</v-col>
+                  <v-col cols="5" md="3" class="font-weight-bold text-h6 total-netpay">Total Net Pay</v-col>
                   <v-col cols="1">:</v-col>
-                  <v-col cols="6" class="font-weight-bold text-h6">{{ formatCurrency(netPay) }}</v-col>
+                  <v-col cols="6" class="font-weight-bold text-h6 total-netpay">{{ formatCurrency(netPay) }}</v-col>
                 </v-row>
                 <v-divider></v-divider>
 
               </v-col>
               <v-divider opacity=".8" thickness="3" gradient vertical></v-divider>
-              <v-col cols="5" class="ml-4 mt-5">
+              <v-col cols="12" md="5" :class="smAndDown ? 'mt-5' : 'ml-4 mt-5'">
                 <!-- <p class="font-weight-bold mb-4"><v-icon start>mdi-credit-card-outline</v-icon> Salary Information</p>
                 <v-divider class="my-4"></v-divider> -->
                 <v-row no-gutters>
@@ -411,10 +416,13 @@
 </template>
 
 <script setup>
-  useHead({
+useHead({
   title: 'Payroll',
 
 })
+import { useDisplay } from 'vuetify'
+const token = useCookie('token')
+const { smAndDown } = useDisplay()
 const baseUrl = useRuntimeConfig().public.strapiUrl
 const route = useRoute();
 const breadcrumbItems = [
@@ -507,7 +515,11 @@ const openEmployeeDialog = async () => {
 
 
 const fetchPayroll = async () => {
-  const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?populate[payslips][populate]=*`)
+  const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?populate[payslips][populate]=*`, {
+    headers: {
+      Authorization: `Bearer ${token.value}`
+    },
+  })
   loading.value = false
   payrollDetails.value = res.data;
   noRecordFound.value = false
@@ -523,7 +535,11 @@ const fetchPayroll = async () => {
 // }
 
 const fetchEmployee = async () => {
-  const res = await $fetch(`${baseUrl}/api/employees?populate=*`);
+  const res = await $fetch(`${baseUrl}/api/employees?populate=*`, {
+    headers: {
+      Authorization: `Bearer ${token.value}`
+    },
+  });
   employees.value = res.data
 }
 
@@ -644,26 +660,36 @@ const submitForm = async () => {
       //console.log("Processing payslip..")
       const payslip = await $fetch(`${baseUrl}/api/payslips`, {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token.value}`
+        },
         body: payload,
       })
-      
+
       payslipId.value = payslip.data.documentId
-      
+
+      console.log("Cash Advance Selected: ", selectedCashAdvanceId.value)
 
       // STEP 2: Processing Cash Advance
       //console.log("Processing cash advance..", payslipId.value)
-      await $fetch(`${baseUrl}/api/cash-advance-payments`, {
-        method: 'POST',
-        body: {
-          data: {
-            cash_advance: selectedCashAdvanceId.value,
-            cash_advance_payment: cashAdvanceDeduction.value,
-            payslips: payslip.data.id,
-            payment_date: new Date().toISOString().split('T')[0],
-            payroll_period: route.params.id
+      if (!selectedCashAdvanceId.value === null) {
+        await $fetch(`${baseUrl}/api/cash-advance-payments`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token.value}`
+          },
+          body: {
+            data: {
+              cash_advance: selectedCashAdvanceId.value,
+              cash_advance_payment: cashAdvanceDeduction.value,
+              payslips: payslip.data.id,
+              payment_date: new Date().toISOString().split('T')[0],
+              payroll_period: route.params.id
+            }
           }
-        }
-      })
+        })
+      }
+
 
       // await $fetch(`${baseUrl}/api/employees/${employee.value?.documentId}`, {
       //   method: 'PUT',
@@ -691,7 +717,10 @@ const submitForm = async () => {
       if (payslipId.value) {
         try {
           await $fetch(`${baseUrl}/api/payslips/${payslipId.value}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+              Authorization: `Bearer ${token.value}`
+            },
           })
           console.warn('Payslip rolled back')
         } catch (rollbackError) {
@@ -811,7 +840,6 @@ watch(cashAdvance, () => {
       cashAdvance.value.cash_advance_balance || 0
     )
   }
-
 })
 
 watch(cashAdvanceDeduction, (deduction) => {
@@ -821,4 +849,9 @@ watch(cashAdvanceDeduction, (deduction) => {
 })
 </script>
 
-<style></style>
+<style scoped>
+.total-netpay {
+  font-size: 2vh;
+  text-transform: uppercase;
+}
+</style>

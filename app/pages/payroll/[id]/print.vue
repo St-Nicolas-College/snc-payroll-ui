@@ -14,6 +14,7 @@
 <script setup>
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
+const token = useCookie('token')
 definePageMeta({
   layout: "printing",
 });
@@ -25,7 +26,9 @@ const payrollDetails = ref({})
 // const payslip = await $fetch(`${baseUrl}/api/payslips/${id}?populate=*`)
 const fetchPayroll = async () => {
   const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?populate[payslips][populate]=*`, {
-
+    headers: {
+              Authorization: `Bearer ${token.value}`
+            },
   })
   // loading.value = false
   payrollDetails.value = res.data;

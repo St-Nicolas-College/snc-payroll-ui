@@ -11,6 +11,10 @@ useHead({
   title: 'Dashboard',
 
 })
+definePageMeta({
+  middleware: 'role-check',
+  allowedRoles: ['Staff']
+})
 </script>
 
 <style>
