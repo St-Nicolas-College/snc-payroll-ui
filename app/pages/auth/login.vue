@@ -79,7 +79,7 @@ const { errorMessage } = storeToRefs(useMyAuthStore())
 //Major: Breaking changes
 //Minor: New Features, backward compatible
 //Patch: Bug fixes only
-const version = ref("1.12.0") //Major.Minor.Patch
+const version = ref("1.13.0") //Major.Minor.Patch
 const username = ref("");
 const password = ref("");
 const user = ref({
@@ -112,7 +112,7 @@ const submit = async () => {
 
   if (valid) {
 
-    console.log("Logging in...")
+    //console.log("Logging in...")
     try {
       await login(user.value)
       if (authenticated.value == true) {
@@ -126,7 +126,7 @@ const submit = async () => {
         loading.value = false;
         snackbar.value = true;
         text.value = errorMessage.value;
-        console.log("Error login: ", errorMessage.value)
+        //console.log("Error login: ", errorMessage.value)
       }
     } catch (err) {
       console.log(err)
@@ -140,33 +140,6 @@ const submit = async () => {
 
 }
 
-// async function handleLogin() {
-//   console.log("Logging in....")
-//   const { valid, errors } = await loginForm.value?.validate();
-//   loading.value = true;
-//   console.log("form is valid: ", valid)
-
-//   if (valid) {
-//     await authenticateUser(user.value);
-//     if (authenticated.value == true) {
-//       lastLoggedIn()
-//       fetchUser()
-//       //userData.value = fetchUser()
-//       loading.value = false;
-//       router.push('/')
-//     }
-//     if (errorLogin.value == true) {
-//       loading.value = false;
-//       snackbar.value = true;
-//       text.value = errorMessage.value;
-//       console.log("Error login: ", errorMessage.value)
-
-//       //alert("Login failed: " + errorMessage.value);
-//     }
-//   } else {
-//     loading.value = false;
-//   }
-// }
 </script>
 
 <style scoped>

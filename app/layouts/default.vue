@@ -16,9 +16,10 @@
           <v-list-item prepend-icon="mdi-account-group" title="Employees" value="employees" to="/employees"
             active-class="v-list-item--active-custom" :active="$route.path.startsWith('/employees')"></v-list-item> -->
 
-            <v-list-item v-for="link in visibleLinks" :key="link.title" :to="link.to" :prepend-icon="link.icon" :title="link.title" active-class="v-list-item--active-custom">
+          <v-list-item v-for="link in visibleLinks" :key="link.title" :to="link.to" :prepend-icon="link.icon"
+            :title="link.title" active-class="v-list-item--active-custom">
 
-            </v-list-item>
+          </v-list-item>
         </v-list>
 
         <template v-slot:append v-if="drawer">
@@ -27,14 +28,14 @@
             <v-row align="center" dense>
               <v-col cols="auto">
                 <v-avatar size="40" color="primary">
-                  <span>AG</span>
+                  <span>{{ userInitial }}</span>
                 </v-avatar>
               </v-col>
               <v-col class="py-0">
                 <div class="font-weight-medium text-body-2">
-                  ALMAR GOMEZ
+                  {{ user?.user_info?.first_name }} {{ user?.user_info?.last_name }}
                 </div>
-                <div class="text-caption text-grey">MIS, HEAD</div>
+                <div class="text-caption text-grey">{{  user?.user_info?.position }}</div>
               </v-col>
               <v-col cols="12">
                 <v-btn color="red-darken-3" variant="tonal" block size="small" @click="handleLogout()">
@@ -78,7 +79,7 @@
         <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props" class="ml-2">
             <v-avatar size="40" color="primary">
-              <span>AG</span>
+              <span>{{ userInitial }}</span>
               <!-- <v-img
                 src="https://avatars.githubusercontent.com/u/9064066?v=4"
               ></v-img> -->
@@ -109,7 +110,9 @@
 
 <script setup>
 import { useTheme } from "vuetify";
+import { useDisplay } from "vuetify/lib/composables/display.mjs";
 const { logUserOut } = useMyAuthStore()
+const { user } = storeToRefs(useMyAuthStore())
 const userStore = useMyAuthStore();
 const links = [
   {
@@ -133,6 +136,7 @@ const links = [
 ]
 
 const drawer = ref(true);
+const { mobile } = useDisplay()
 const theme = useTheme();
 //theme.global.name.value = "light";
 theme.change('light')
@@ -140,6 +144,8 @@ theme.change('light')
 const visibleLinks = computed(() => {
   return links.filter((link) => link.roles.includes(userStore.role))
 })
+
+const userInitial = ref(user.value.user_info?.first_name.substring(0, 1) + user.value.user_info?.last_name.substring(0, 1))
 
 // Function to toggle between dark and light themes
 function toggleTheme() {
@@ -154,6 +160,14 @@ const handleLogout = () => {
   //router.push("/auth/login")
   window.location.href = "/auth/login";
 };
+
+watch(mobile, (isMobile) => {
+  drawer.value = !isMobile;
+},
+  {
+    immediate: true
+  }
+)
 </script>
 
 <style>

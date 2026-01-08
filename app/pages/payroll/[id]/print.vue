@@ -1,12 +1,6 @@
 <template>
- <!-- You can place the button anywhere you want -->
-  <!-- <v-btn color="primary" class="mb-4" @click="downloadPdf">
-    Download PDF
-  </v-btn> -->
-
   <!-- Printable area -->
   <div >
-
     <PayslipPrint :payslips="payrollDetails.payslips" />
   </div>
 </template>
@@ -32,7 +26,7 @@ const fetchPayroll = async () => {
   })
   // loading.value = false
   payrollDetails.value = res.data;
-  console.log('Payroll Details:', res.data)
+  //console.log('Payroll Details:', res.data)
 }
 
 

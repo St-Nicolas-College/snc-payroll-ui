@@ -4,7 +4,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     const allowedRoles = to.meta.allowedRoles as string[] | undefined
     const currentRole = authStore.role
 
-    console.log("Role Check middleware")
+    //console.log("Role Check middleware")
 
     // If no roles defined, allow everyone
     if (!allowedRoles || allowedRoles.length === 0) return

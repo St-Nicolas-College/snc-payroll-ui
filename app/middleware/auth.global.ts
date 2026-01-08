@@ -1,7 +1,7 @@
 export default defineNuxtRouteMiddleware(async (to) => {
 const userStore = useMyAuthStore();
 const userRole = userStore.user?.role?.name
-console.log("Global middleware")
+//console.log("Global middleware")
 if (!userStore.user) {
     await userStore.fetchUser();
 }
@@ -20,7 +20,7 @@ if (userRole === 'Admin' && !to.path.startsWith("/admin")) {
 const requiredRole = to.meta.requiredRole;
 const actualRole = userRole;
 
-console.log("redirect to pages", userRole)
+//console.log("redirect to pages", userRole)
 if (requiredRole) {
     const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
 

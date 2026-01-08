@@ -453,13 +453,6 @@ const header = [
   { title: 'Cash Advance', key: 'cash_advance_deduction', sortable: false },
   { title: 'Health Card', key: 'health_card', sortable: false },
   { title: 'Net Pay', key: 'net_pay', sortable: false },
-
-  // { title: 'Employee No', key: 'employee_no', sortable: false },
-  // { title: 'Name', key: 'employee_name', sortable: false },
-  // { title: 'Position', key: 'position', sortable: false },
-  // { title: 'Department', key: 'department', sortable: false },
-  // { title: 'Rate per day', key: 'rate_per_day', sortable: false },
-  // { title: 'Rate per hour', key: 'rate_per_hour', sortable: false },
   { title: 'Actions', key: 'actions', align: 'end', sortable: false },
 ];
 const noRecordFound = ref(true)
@@ -508,13 +501,10 @@ const rules = {
   general: (v) => !!v || "This field is required"
 }
 
-
-
 const openEmployeeDialog = async () => {
   fetchEmployee();
   createEmployeePayrollDialog.value = true
 }
-
 
 const fetchPayroll = async () => {
   const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?populate[payslips][populate]=*`, {
@@ -528,13 +518,6 @@ const fetchPayroll = async () => {
   //console.log('Payroll Details:', res.data)
 }
 
-// const fetchPayslips = async () => {
-//    const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?populate[payslips][populate]=*`, {
-//   })
-
-//   payrollDetails.value = res.data;
-//   console.log('Payroll Details:', res.data)
-// }
 
 const fetchEmployee = async () => {
   const res = await $fetch(`${baseUrl}/api/employees?populate=*`, {
@@ -670,7 +653,7 @@ const submitForm = async () => {
 
       payslipId.value = payslip.data.documentId
 
-      console.log("Cash Advance Selected: ", selectedCashAdvanceId.value)
+      //console.log("Cash Advance Selected: ", selectedCashAdvanceId.value)
 
       // STEP 2: Processing Cash Advance
       //console.log("Processing cash advance..", payslipId.value)

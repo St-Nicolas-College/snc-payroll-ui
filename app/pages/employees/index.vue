@@ -87,15 +87,13 @@
                   v-model="pagibig" variant="solo-filled" flat></v-text-field></v-col>
             </v-row>
 
-            <v-list-subheader class="font-weight-bold mt-2">Other Deductions</v-list-subheader>
+            <!-- <v-list-subheader class="font-weight-bold mt-2">Other Deductions</v-list-subheader>
             <v-row dense>
               <v-col cols="12" md="6"><v-text-field hide-details="auto" type="number" prefix="₱"
                   label="Cash Advance Amount" v-model="cashAdvanceAmount" variant="solo-filled"
                   flat></v-text-field></v-col>
-              <!-- <v-col cols="12" md="6"><v-text-field hide-details="auto" type="number" prefix="₱"
-                  label="Cash Advance Balance" v-model="cashAdvanceBalance" variant="solo-filled"
-                  flat></v-text-field></v-col> -->
-            </v-row>
+           
+            </v-row> -->
           </v-form>
         </v-card-text>
         <v-divider></v-divider>
@@ -199,7 +197,7 @@ const getUsers = async () => {
 
     if (res) {
       employees.value = res.data;
-      console.log("Employees: ", res.data)
+      //console.log("Employees: ", res.data)
       loading.value = false
     }
   } catch (err) {
@@ -227,8 +225,8 @@ const createEmployee = async () => {
           sss: sss.value,
           philhealth: philhealth.value,
           pagibig: pagibig.value,
-          cash_advance_amount: cashAdvanceAmount.value,
-          cash_advance_balance: cashAdvanceAmount.value
+          //cash_advance_amount: cashAdvanceAmount.value,
+          //cash_advance_balance: cashAdvanceAmount.value
         }
       }
 
@@ -243,7 +241,7 @@ const createEmployee = async () => {
 
       getUsers();
       loadingBtn.value = false
-      console.log("Employee successfully created: ", payload)
+      //console.log("Employee successfully created: ", payload)
       alert("Employee successfully created")
       createEmployeeForm.value?.reset();
       basicPay.value = 0;
@@ -313,63 +311,7 @@ const computeValues = () => {
 
 watch(form, computeValues, { deep: true })
 
-const submitForm = async () => {
-  const payload = {
-    // payroll_period: form.value.payroll_period.documentId,
-    // employee: employee_id.value,
-    basic_pay: form?.value.basic_pay,
-    honorarium: form?.value.honorarium,
-    premium: form?.value.premium,
-    extra_loads: form?.value.extra_loads,
-    overtime: form?.value.overtime,
-    late_deduction: form?.value.late_deduction,
-    sss: form?.value.sss,
-    philhealth: form?.value.philhealth,
-    pagibig: form?.value.pagibig,
-    withholding_tax: form?.value.withholding_tax,
-    sss_loan: form?.value.sss_loan,
-    pagibig_loan: form?.value.pagibig_loan,
-    cash_advance: form?.value.cash_advance,
-    health_card: form?.value.health_card
-  }
-  console.log("Form data: ", payload)
 
-  await $fetch(`${baseUrl}/api/payslips`, {
-    method: 'POST',
-    headers: {
-              Authorization: `Bearer ${token.value}`
-            },
-    body: {
-      data: {
-        payroll_period: form.value?.payroll_period.documentId,
-        employee: employee_id.value,
-        basic_pay: form?.value.basic_pay,
-        honorarium: form?.value.honorarium,
-        premium: form?.value.premium,
-        amount_per_unit: form?.value.amount_per_unit,
-        no_of_unit: form?.value.no_of_unit,
-        units_total_amount: form?.value.units_total_amount,
-        overtime: form?.value.overtime,
-        late_deduction: form?.value.late_deduction,
-        gross_pay: form?.value.gross_pay,
-        sss: form?.value.sss,
-        philhealth: form?.value.philhealth,
-        pagibig: form?.value.pagibig,
-        net_gross_pay: form?.value.net_gross_pay,
-        withholding_tax: form?.value.withholding_tax,
-        sss_loan: form?.value.sss_loan,
-        pagibig_loan: form?.value.pagibig_loan,
-        cash_advance_amount: form?.value.cash_advance_amount,
-        cash_advance_balance: form?.value.cash_advance_balance,
-        cash_advance_deduction: form?.value.cash_advance_deduction,
-        health_card: form?.value.health_card,
-        net_pay: form?.value.net_pay
-      }
-    }
-  })
-
-  alert("Saved");
-}
 </script>
 
 <style></style>

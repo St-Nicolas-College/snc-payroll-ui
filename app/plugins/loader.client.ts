@@ -2,7 +2,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const { isLoading } = useLoader()
   const router = useRouter()
 
-  console.log("✅ Loader plugin active")
+  //console.log("✅ Loader plugin active")
 
     // Track when loader was shown
   let startTime: number | null = null
@@ -15,7 +15,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
 // Navigation start
   router.beforeEach((to, from, next) => {
-    console.log("➡️ Navigation started:", to.fullPath)
+    //console.log("➡️ Navigation started:", to.fullPath)
     startTime = Date.now()
     isLoading.value = true
     next()
@@ -23,7 +23,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   // Navigation finish
   router.afterEach((to) => {
-    console.log("✅ Navigation finished:", to.fullPath)
+    //console.log("✅ Navigation finished:", to.fullPath)
    const elapsed = Date.now() - (startTime ?? 0)
     const remaining = minDuration - elapsed
 

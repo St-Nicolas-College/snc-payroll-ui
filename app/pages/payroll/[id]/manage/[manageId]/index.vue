@@ -380,7 +380,7 @@ const fetchPayslipDetails = async () => {
   payslipDetails.value = res.data
   payrollPeriod.value = res.data.payroll_period
   employee.value = res.data.employee
-  console.log('Payslip Details:', res.data)
+  //console.log('Payslip Details:', res.data)
 }
 
 const deletePayslipDetails = async () => {
@@ -407,9 +407,9 @@ const deletePayslipDetails = async () => {
       })
     ])
     
-    console.log('Payslip deleted..', payslip);
-    console.log('Cash advance payment deteled..', cashAdvance)
-    console.log('Payslip record deleted successfully')
+    //console.log('Payslip deleted..', payslip);
+    //console.log('Cash advance payment deteled..', cashAdvance)
+    //console.log('Payslip record deleted successfully')
     deletePayslipDialog.value = false
     navigateTo(`/payroll/${payrollId}`)
   } catch (err) {

@@ -18,8 +18,8 @@
 
       </v-card-title>
       <v-divider></v-divider>
-      <v-data-table density="compact" :headers="header" :items="payrolls" :search="search" :loading="loading"
-        show-select>
+      <v-data-table density="compact" :headers="header" :items="payrolls" :items-per-page="pageSize"
+        :hide-default-footer="true" :search="search" :loading="loading" show-select>
 
         <template v-slot:[`item.payroll_period`]="{ item }">
           {{ formatDate(item.payroll_period_start) }} - {{ formatDate(item.payroll_period_end) }}
@@ -36,6 +36,8 @@
           </v-btn>
         </template>
       </v-data-table>
+      <v-divider></v-divider>
+      <v-pagination v-model="page" :length="pagination.pageCount" total-visible="7" />
     </v-card>
 
     <v-card elevation="0" rounded="lg" class="mt-5 d-md-none">
@@ -43,7 +45,7 @@
         <v-toolbar-title><v-icon start>mdi-cash-clock</v-icon> Payroll Management</v-toolbar-title>
       </v-toolbar>
       <v-divider></v-divider>
-     
+
       <v-card-text>
         <div v-for="payroll in payrolls" :key="payroll.id" class="mt-2">
           <v-row dense>
@@ -67,7 +69,8 @@
       </v-card-text>
     </v-card>
 
-    <v-fab class="d-md-none" location="right bottom" size="large" app="fixed" color="primary"  @click="createPayrollDialog = true" icon>
+    <v-fab class="d-md-none" location="right bottom" size="large" app color="primary"
+      @click="createPayrollDialog = true" icon>
       <v-icon>mdi-plus</v-icon>
     </v-fab>
 
@@ -130,7 +133,14 @@ const payrollPeriod = ref(null)
 const rules = {
   payrollPeriod: (v) => !!v || "this field is required"
 }
-
+const page = ref(1)
+const pageSize = 10
+const pagination = ref({
+  page: 1,
+  pageSize: 10,
+  pageCount: 0,
+  total: 0
+})
 
 onMounted(async () => {
   await getPayroll();
@@ -142,10 +152,16 @@ const getPayroll = async () => {
       headers: {
         Authorization: `Bearer ${token.value}`
       },
+      query: {
+        populate: '*',
+        'pagination[page]': page.value,
+        'pagination[pageSize]': pageSize
+      }
     })
 
     if (res) {
       payrolls.value = res.data;
+      pagination.value = res.meta.pagination
       //console.log("Payroll Period: ", res.data)
       loading.value = false
     }
@@ -159,8 +175,7 @@ const getPayroll = async () => {
 const createPayroll = async () => {
   const { valid } = await createPayrollForm.value.validate();
   if (!valid) return
-  console.log("1")
-
+  //console.log("1")
 
   try {
 
@@ -208,6 +223,8 @@ const formatDate = (dateStr) => {
     day: "numeric",
   });
 };
+
+watch(page, getPayroll)
 
 </script>
 
