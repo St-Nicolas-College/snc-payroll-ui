@@ -13,12 +13,13 @@
 
         <v-form v-model="valid" ref="loginForm" lazy-validation @submit.prevent="submit">
           <v-text-field v-model="user.identifier" label=" Username" :rules="[rules.required]"
-            prepend-inner-icon="mdi-account-outline" bg-color="white" variant="solo-filled" rounded="xl" flat class="mb-4" hide-details="auto" dense />
+            prepend-inner-icon="mdi-account-outline" bg-color="white" variant="solo-filled" rounded="xl" flat
+            class="mb-4" hide-details="auto" dense />
 
           <v-text-field v-model="user.password" label="Password" :type="showPassword ? 'text' : 'password'"
             :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" @click:append-inner="togglePasswordVisibility"
-            :rules="[rules.required]" prepend-inner-icon="mdi-lock-outline" bg-color="white" rounded="xl" variant="solo-filled" flat class="mb-2"
-            hide-details="auto" dense />
+            :rules="[rules.required]" prepend-inner-icon="mdi-lock-outline" bg-color="white" rounded="xl"
+            variant="solo-filled" flat class="mb-2" hide-details="auto" dense />
 
           <div class="d-flex justify-end mb-4">
             <NuxtLink class="text-caption text-blue-darken-2">
@@ -48,7 +49,7 @@
       </v-footer>
 
 
-      <v-snackbar v-model="snackbar" location="top" color="error">
+      <v-snackbar v-model="snackbar1" location="top" color="error">
         {{ text }}
 
         <template v-slot:actions>
@@ -62,7 +63,6 @@
 </template>
 
 <script setup>
-
 definePageMeta({
   layout: "auth",
 });
@@ -70,6 +70,7 @@ useHead({
   title: "Log In",
 });
 const router = useRouter();
+const snackbar = useSnackbar();
 const { login, fetchUser } = useMyAuthStore()
 const { authenticated } = storeToRefs(useMyAuthStore())
 const { errorLogin } = storeToRefs(useMyAuthStore())
@@ -91,7 +92,7 @@ const showPassword = ref(false);
 const loginForm = ref(null);
 const loading = ref(false);
 const error = ref('')
-const snackbar = ref(false);
+const snackbar1 = ref(false);
 const text = ref("");
 
 
@@ -124,8 +125,11 @@ const submit = async () => {
 
       if (errorLogin.value == true) {
         loading.value = false;
-        snackbar.value = true;
-        text.value = errorMessage.value;
+        snackbar.add({
+          type: 'error',
+          text: errorMessage.value,
+        })
+       
         //console.log("Error login: ", errorMessage.value)
       }
     } catch (err) {
@@ -155,7 +159,7 @@ body {
       #22c55e,
       #34b864); */
   /* Light Green to Dark Green */
-/* background: linear-gradient(180deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%); */
-background: #E0E0E0;
+  /* background: linear-gradient(180deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%); */
+  background: #E0E0E0;
 }
 </style>

@@ -5,5 +5,6 @@ const { isLoading } = useLoader()
   <NuxtLayout>
     <AppLoader :show="isLoading" />
     <NuxtPage />
+        <NuxtSnackbar />
   </NuxtLayout>
 </template>

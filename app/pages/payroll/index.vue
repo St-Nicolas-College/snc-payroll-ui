@@ -45,31 +45,29 @@
         <v-toolbar-title><v-icon start>mdi-cash-clock</v-icon> Payroll Management</v-toolbar-title>
       </v-toolbar>
       <v-divider></v-divider>
-
-      <v-card-text>
-        <div v-for="payroll in payrolls" :key="payroll.id" class="mt-2">
-          <v-row dense>
-            <v-col cols="10">
-              <v-row no-gutters>
-                <v-col cols="12">
-                  {{ formatDate(payroll.payroll_period_start) }} - {{ formatDate(payroll.payroll_period_end) }}
-                </v-col>
-                <v-col cols="12" class="text-medium-emphasis text-color-grey">
-                  Created by:
-                </v-col>
-
-              </v-row>
-            </v-col>
-            <v-col cols="2" class="text-right">
-              <v-btn icon="mdi-open-in-new" :to="`/payroll/${payroll.documentId}`" variant="text" color="info"></v-btn>
-            </v-col>
-          </v-row>
-          <v-divider></v-divider>
-        </div>
+    </v-card>
+    <v-card v-for="payroll in payrolls" :key="payroll.id" rounded="lg"  class="d-md-none mt-1" elevation="0" :to="`/payroll/${payroll.documentId}`">
+      <v-card-text class="pa-3">
+        <v-row dense>
+          <v-col cols="10">
+            <v-row no-gutters>
+              <v-col cols="12">
+                {{ formatDate(payroll.payroll_period_start) }} - {{ formatDate(payroll.payroll_period_end) }}
+              </v-col>
+              <v-col cols="12" class="text-medium-emphasis text-color-grey">
+                Created by:
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col cols="2" class="text-right">
+            <v-btn icon="mdi-open-in-new" :to="`/payroll/${payroll.documentId}`" variant="text" color="info"></v-btn>
+          </v-col>
+        </v-row>
+        <!-- <v-divider></v-divider> -->
       </v-card-text>
     </v-card>
 
-    <v-fab class="d-md-none" location="right bottom" size="large" app color="primary"
+    <v-fab class="d-md-none mb-14" location="bottom right" size="large" app color="primary"
       @click="createPayrollDialog = true" icon>
       <v-icon>mdi-plus</v-icon>
     </v-fab>

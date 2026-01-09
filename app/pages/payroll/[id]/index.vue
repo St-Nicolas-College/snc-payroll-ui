@@ -19,9 +19,14 @@
 
             <!-- RIGHT: ACTION BUTTONS -->
             <v-col cols="12" md="6" class="d-flex justify-end" :class="smAndDown ? 'flex-column ga-2' : 'ga-2'">
-              <v-btn color="info" class="text-capitalize" prepend-icon="mdi-printer" :block="smAndDown"
-                @click="openPrintWindow">
+               <v-btn color="info" class="text-capitalize" prepend-icon="mdi-printer" :block="smAndDown"
+                @click="openPrintPayrollWindow">
                 Print Payroll
+              </v-btn>
+
+              <v-btn color="teal" class="text-capitalize" prepend-icon="mdi-printer" :block="smAndDown"
+                @click="openPrintPayslipWindow">
+                Print Payslip
               </v-btn>
 
               <v-btn color="success" class="text-capitalize" prepend-icon="mdi-plus" :block="smAndDown"
@@ -89,19 +94,69 @@
             variant="solo-filled" flat hide-details single-line></v-text-field>
         </v-card-title>
         <v-divider></v-divider>
-        <v-card-text>
-          <v-data-table density="compact" :items-per-page="-1" :hide-default-footer="true" :headers="header"
+        
+          <v-data-table density="compact" :items-per-page="-1" :hide-default-footer="false" :headers="header"
             :items="payrollDetails.payslips" :search="search" :loading="loading">
+            <template v-slot:[`item.basic_pay`]="{ item }">
+              {{ formatCurrency(item.basic_pay) }}
+            </template>
+            <template v-slot:[`item.honorarium`]="{ item }">
+              {{ formatCurrency(item.honorarium) }}
+            </template>
+            <template v-slot:[`item.premium`]="{ item }">
+              {{ formatCurrency(item.premium) }}
+            </template>
+            <template v-slot:[`item.units_total_amount`]="{ item }">
+              {{ formatCurrency(item.units_total_amount) }}
+            </template>
+            <template v-slot:[`item.overtime`]="{ item }">
+              {{ formatCurrency(item.overtime) }}
+            </template>
+            <template v-slot:[`item.late_deduction`]="{ item }">
+              {{ formatCurrency(item.late_deduction) }}
+            </template>
+             <template v-slot:[`item.gross_pay`]="{ item }">
+             <div class="font-weight-bold"> {{ formatCurrency(item.gross_pay) }}</div>
+            </template>
+            <template v-slot:[`item.sss`]="{ item }">
+              {{ formatCurrency(item.sss) }}
+            </template>
+            <template v-slot:[`item.philhealth`]="{ item }">
+              {{ formatCurrency(item.philhealth) }}
+            </template>
+            <template v-slot:[`item.pagibig`]="{ item }">
+              {{ formatCurrency(item.pagibig) }}
+            </template>
+            <template v-slot:[`item.net_gross_pay`]="{ item }">
+              <div class="font-weight-bold">{{ formatCurrency(item.net_gross_pay) }}</div>
+            </template>
+            <template v-slot:[`item.withholding_tax`]="{ item }">
+              {{ formatCurrency(item.withholding_tax) }}
+            </template>
+            <template v-slot:[`item.sss_loan`]="{ item }">
+              {{ formatCurrency(item.sss_loan) }}
+            </template>
+            <template v-slot:[`item.pagibig_loan`]="{ item }">
+              {{ formatCurrency(item.pagibig_loan) }}
+            </template>
+            <template v-slot:[`item.cash_advance_deduction`]="{ item }">
+              {{ formatCurrency(item.cash_advance_deduction) }}
+            </template>
+            <template v-slot:[`item.health_card`]="{ item }">
+              {{ formatCurrency(item.health_card) }}
+            </template>
+            <template v-slot:[`item.net_pay`]="{ item }">
+             <div class="font-weight-bold">{{ formatCurrency(item.net_pay) }}</div> 
+            </template>
             <template v-slot:[`item.actions`]="{ item }">
               <!-- <v-btn size="small" class="mr-1" icon="mdi-account-cog-outline" variant="tonal" color="blue"
               :to="`/employees/${item.documentId}`"></v-btn> -->
               <v-btn size="small" class="mr-1" variant="tonal" color="info"
-                :to="`/payroll/${route.params.id}/manage/${item.documentId}`"><v-icon
-                  start>mdi-account-cog-outline</v-icon> Manage</v-btn>
+                :to="`/payroll/${route.params.id}/manage/${item.documentId}`"><v-icon>mdi-account-cog-outline</v-icon></v-btn>
 
             </template>
           </v-data-table>
-        </v-card-text>
+      
       </v-card>
 
     </div>
@@ -528,7 +583,39 @@ const fetchEmployee = async () => {
   employees.value = res.data
 }
 
-const openPrintWindow = () => {
+
+// Open a new window for payroll printing
+const openPrintPayrollWindow = () => {
+  const url = `/payroll/${route.params.id}/report`
+  const width = 1024
+  const height = 800
+
+  // Get current screen position (supports multi-monitor)
+  const dualScreenLeft = window.screenLeft ?? window.screenX
+  const dualScreenTop = window.screenTop ?? window.screenY
+
+  const screenWidth = window.innerWidth ?? document.documentElement.clientWidth
+  const screenHeight = window.innerHeight ?? document.documentElement.clientHeight
+
+  // Calculate center position
+  const left = (screenWidth - width) / 2 + dualScreenLeft
+  const top = (screenHeight - height) / 2 + dualScreenTop
+
+  window.open(url,
+    'printWindow',
+    `
+  width=${width}
+  height=${height}
+  top-${top}
+  left=${left}
+  resizabe=yes
+  scrollbars=yes`
+  )
+}
+
+
+// Open a new window for payslip printing
+const openPrintPayslipWindow = () => {
   const url = `/payroll/${route.params.id}/print`
   const width = 800
   const height = 800
@@ -629,9 +716,9 @@ const submitForm = async () => {
           withholding_tax: withHoldingTax.value,
           sss_loan: sssLoan.value,
           pagibig_loan: pagibigLoan.value,
-          cash_advance_amount: cashAdvanceAmount.value,
-          cash_advance_balance: cashAdvanceBalance.value,
-          cash_advance_deduction: cashAdvanceDeduction.value,
+          //cash_advance_amount: cashAdvanceAmount.value,
+          //cash_advance_balance: cashAdvanceBalance.value,
+          //cash_advance_deduction: cashAdvanceDeduction.value,
           health_card: healthCard.value,
           net_pay: netPay.value
         }
@@ -848,6 +935,25 @@ watch(cashAdvanceDeduction, (deduction) => {
 </script>
 
 <style scoped>
+:deep() .v-table .v-table__wrapper>table>thead>tr>th {
+  /* border-right: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border-bottom: thick solid rgba(var(--v-border-color), var(--v-border-opacity)); */
+  font-weight: bold;
+
+}
+
+/* :deep() .v-table .v-table__wrapper>table>tbody>tr>td:not(:last-child),
+.v-table .v-table__wrapper>table>tbody>tr>th:not(:last-child) {
+  border-right: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+} */
+/* :deep() .v-table .v-table__wrapper>table>tbody>tr:nth-child(even) {
+  background-color: #f2f2f2;
+} */
+
+:deep() .v-table .v-table__wrapper>table>tbody>tr:hover {
+  background-color: #f2f2f2;
+}
+
 .total-netpay {
   font-size: 2vh;
   text-transform: uppercase;
