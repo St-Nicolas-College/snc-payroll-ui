@@ -28,9 +28,9 @@
             @click="openPayrollDialog(item)"></v-btn> -->
           <v-btn size="small" class="mr-1" variant="tonal" color="info" :to="`/employees/${item.documentId}`"><v-icon
               start>mdi-account-cog-outline</v-icon> Manage</v-btn>
-          <v-btn size="small" variant="tonal" color="red" @click="deleteItem(item.documentId)">
+          <!-- <v-btn size="small" variant="tonal" color="red" @click="deleteItem(item.documentId)">
             <v-icon>mdi-delete</v-icon> Delete
-          </v-btn>
+          </v-btn> -->
         </template>
       </v-data-table>
     </v-card>

@@ -48,10 +48,10 @@
             formatDate(p.payroll_period.payroll_period_end) }}
         </div>
 
-        <div style="margin-top: 6px; border-top: 1px solid black;"></div>
+        <div style="margin-top: 3px; border-top: 1px solid black;"></div>
 
         <!-- EARNINGS SECTION -->
-        <div style="margin-top: 4px; font-weight: bold;">EARNINGS</div>
+        <div style="margin-top: 2px; font-weight: bold;">EARNINGS</div>
         <div class="row">
           <span>Loads/Extra Loads</span>
           <span v-if="p.no_of_units != 0">{{ p.no_of_units }}</span>
@@ -85,7 +85,7 @@
         </div>
 
         <!-- CONTRIBUTIONS -->
-        <div style="margin-top: 6px; font-weight: bold;">CONTRIBUTIONS</div>
+        <div style="margin-top: 3px; font-weight: bold;">CONTRIBUTIONS</div>
         <div class="row">
           <span>SSS</span>
           <span>{{ formatCurrency(p.sss) }}</span>
@@ -105,7 +105,7 @@
         </div>
 
         <!-- DEDUCTIONS -->
-        <div style="margin-top: 6px; font-weight: bold;">OTHER DEDUCTIONS</div>
+        <div style="margin-top: 3px; font-weight: bold;">OTHER DEDUCTIONS</div>
         <div class="row">
           <span>Withholding Tax</span>
           <span>{{ formatCurrency(p.withholding_tax) }}</span>
@@ -382,7 +382,7 @@ const formatDate = (dateStr) => {
 .print-grid {
   width: 210mm;
   height: 297mm;
-  padding: 5mm;
+  padding: 8mm;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -420,7 +420,7 @@ const formatDate = (dateStr) => {
   padding: 2px 0;
 }
 .netpay-total {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .off-screen-temp-print {
@@ -435,8 +435,8 @@ const formatDate = (dateStr) => {
   align-items: center;
   gap: 12px;
   border-bottom: 2px solid black;
-  padding-bottom: 6px;
-  margin-bottom: 5px;
+  padding-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 .logo {
