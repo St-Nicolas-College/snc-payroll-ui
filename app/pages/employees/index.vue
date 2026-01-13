@@ -54,28 +54,32 @@
             <!-- <v-list-subheader class="font-weight-bold">Employee Information</v-list-subheader> -->
 
             <v-row dense>
-              <v-col cols="12" md="4"><v-text-field hide-details="auto" :rules="[rules.general]" label="Employee No" v-model="employeeNo"
-                  variant="solo-filled" flat></v-text-field></v-col>
-              <v-col cols="12" md="8"><v-text-field hide-details="auto" :rules="[rules.general]" label="Employee Name" v-model="employeeName"
-                  variant="solo-filled" flat></v-text-field></v-col>
+              <v-col cols="12" md="4"><v-text-field hide-details="auto" :rules="[rules.general]" label="Employee No"
+                  v-model="employeeNo" variant="solo-filled" flat></v-text-field></v-col>
+              <v-col cols="12" md="8"><v-text-field hide-details="auto" :rules="[rules.general]" label="Employee Name"
+                  v-model="employeeName" variant="solo-filled" flat></v-text-field></v-col>
             </v-row>
             <v-row dense>
-              <v-col cols="12" md="6"><v-text-field label="Position" :rules="[rules.general]" v-model="position" variant="solo-filled"
-                  flat></v-text-field></v-col>
-              <v-col cols="12" md="6"><v-text-field label="Department" :rules="[rules.general]" v-model="department" variant="solo-filled"
-                  flat></v-text-field></v-col>
+              <v-col cols="12" md="6"><v-text-field label="Position" :rules="[rules.general]" v-model="position"
+                  variant="solo-filled" flat></v-text-field></v-col>
+              <v-col cols="12" md="6"><v-text-field label="Department" :rules="[rules.general]" v-model="department"
+                  variant="solo-filled" flat></v-text-field></v-col>
             </v-row>
             <v-divider class="mb-4"></v-divider>
             <p class="font-weight-bold mb-4"><v-icon start>mdi-credit-card-outline</v-icon> Salary Information</p>
             <v-row dense>
-              <v-col cols="12" md="3"><v-text-field hide-details="auto" :rules="[rules.general]" type="number" prefix="₱" label="Basic Pay"
-                  v-model="basicPay" variant="solo-filled" flat></v-text-field></v-col>
-              <v-col cols="12" md="3"><v-text-field hide-details="auto"  type="number" prefix="₱" label="Honorarium"
+              <v-col cols="12" md="4"><v-text-field hide-details="auto" :rules="[rules.general]" type="number"
+                  prefix="₱" label="Basic Pay" v-model="basicPay" variant="solo-filled" flat></v-text-field></v-col>
+              <v-col cols="12" md="4"><v-text-field hide-details="auto" type="number" prefix="₱" label="Honorarium"
                   v-model="honorarium" variant="solo-filled" flat></v-text-field></v-col>
-              <v-col cols="12" md="3"><v-text-field hide-details="auto"  type="number" prefix="₱" label="Premium"
+              <v-col cols="12" md="4"><v-text-field hide-details="auto" type="number" prefix="₱" label="Premium"
                   v-model="premium" variant="solo-filled" flat></v-text-field></v-col>
-              <v-col cols="12" md="3"><v-text-field hide-details="auto"  type="number" prefix="₱" label="Amount Per Unit"
+              <v-col cols="12" md="4"><v-text-field hide-details="auto" type="number" prefix="₱" label="Amount Per Unit"
                   v-model="amountPerUnit" variant="solo-filled" flat></v-text-field></v-col>
+              <v-col cols="12" md="4"><v-text-field hide-details="auto" type="number" prefix="₱" label="Cisco Rate"
+                  v-model="ciscoRate" variant="solo-filled" flat></v-text-field></v-col>
+              <v-col cols="12" md="4"><v-text-field hide-details="auto" type="number" prefix="₱" label="RLE Rate"
+                  v-model="rleRate" variant="solo-filled" flat></v-text-field></v-col>
             </v-row>
             <v-list-subheader class="font-weight-bold mt-2">Premiums</v-list-subheader>
             <v-row dense>
@@ -87,19 +91,22 @@
                   v-model="pagibig" variant="solo-filled" flat></v-text-field></v-col>
             </v-row>
 
-            <!-- <v-list-subheader class="font-weight-bold mt-2">Other Deductions</v-list-subheader>
+            <v-list-subheader class="font-weight-bold mt-2">Other Deductions</v-list-subheader>
             <v-row dense>
               <v-col cols="12" md="6"><v-text-field hide-details="auto" type="number" prefix="₱"
-                  label="Cash Advance Amount" v-model="cashAdvanceAmount" variant="solo-filled"
+                  label="SSS Loan" v-model="sssLoan" variant="solo-filled"
                   flat></v-text-field></v-col>
-           
-            </v-row> -->
+           <v-col cols="12" md="6"><v-text-field hide-details="auto" type="number" prefix="₱"
+                  label="Pag-ibig Loan" v-model="pagibigLoan" variant="solo-filled"
+                  flat></v-text-field></v-col>
+            </v-row>
           </v-form>
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="mt-2" color="primary" :loading="loadingBtn" :disabled="loadingBtn" @click="createEmployee()" variant="elevated" type="submit">Create
+          <v-btn class="mt-2" color="primary" :loading="loadingBtn" :disabled="loadingBtn" @click="createEmployee()"
+            variant="elevated" type="submit">Create
             Employee</v-btn>
           <v-spacer></v-spacer>
         </v-card-actions>
@@ -114,7 +121,7 @@
 </template>
 
 <script setup>
-  useHead({
+useHead({
   title: 'Employees',
 
 })
@@ -152,9 +159,13 @@ const basicPay = ref(0)
 const honorarium = ref(0)
 const premium = ref(0)
 const amountPerUnit = ref(0)
+const ciscoRate = ref(0)
+const rleRate = ref(0)
 const sss = ref(0)
 const philhealth = ref(0)
 const pagibig = ref(0)
+const sssLoan = ref(0)
+const pagibigLoan = ref(0)
 const cashAdvanceAmount = ref(0)
 const cashAdvanceBalance = ref(0)
 
@@ -181,8 +192,8 @@ const openPayrollDialog = async (item) => {
 const fetchPayroll = async () => {
   const res = await $fetch(`${baseUrl}/api/payroll-periods`, {
     headers: {
-              Authorization: `Bearer ${token.value}`
-            },
+      Authorization: `Bearer ${token.value}`
+    },
   });
   payroll.value = res.data
 }
@@ -191,8 +202,8 @@ const getUsers = async () => {
   try {
     const res = await $fetch(`${baseUrl}/api/employees?populate=*`, {
       headers: {
-              Authorization: `Bearer ${token.value}`
-            },
+        Authorization: `Bearer ${token.value}`
+      },
     })
 
     if (res) {
@@ -222,9 +233,13 @@ const createEmployee = async () => {
           honorarium: honorarium.value,
           premium: premium.value,
           amount_per_unit: amountPerUnit.value,
+          cisco_rate: ciscoRate.value,
+          rle_rate: rleRate.value,
           sss: sss.value,
           philhealth: philhealth.value,
           pagibig: pagibig.value,
+          sss_loan: sssLoan.value,
+          pagibig_loan: pagibigLoan.value
           //cash_advance_amount: cashAdvanceAmount.value,
           //cash_advance_balance: cashAdvanceAmount.value
         }
@@ -234,8 +249,8 @@ const createEmployee = async () => {
       await $fetch(`${baseUrl}/api/employees`, {
         method: 'POST',
         headers: {
-              Authorization: `Bearer ${token.value}`
-            },
+          Authorization: `Bearer ${token.value}`
+        },
         body: payload
       })
 
@@ -248,9 +263,13 @@ const createEmployee = async () => {
       honorarium.value = 0;
       premium.value = 0
       amountPerUnit.value = 0;
+      ciscoRate.value = 0;
+      rleRate.value = 0;
       sss.value = 0
       philhealth.value = 0;
       pagibig.value = 0;
+      sssLoan.value = 0;
+      pagibigLoan.value = 0;
       cashAdvanceAmount.value = 0;
       //cashAdvanceBalance.value = 0;
     } catch (err) {
@@ -276,40 +295,40 @@ const search = ref('')
 const loading = ref(true)
 const createUserDialog = ref(false)
 
-const form = ref({
-  payroll_period: '',
-  employee: employee_id,
-  basic_pay: 0,
-  honorarium: 0,
-  premium: 0,
-  extra_loads: 0,
-  overtime: 0,
-  late_deduction: 0,
-  sss: 0,
-  philhealth: 0,
-  pagibig: 0,
-  withholding_tax: 0,
-  sss_loan: 0,
-  pagibig_loan: 0,
-  cash_advance: 0,
-  health_card: 0
-})
+// const form = ref({
+//   payroll_period: '',
+//   employee: employee_id,
+//   basic_pay: 0,
+//   honorarium: 0,
+//   premium: 0,
+//   extra_loads: 0,
+//   overtime: 0,
+//   late_deduction: 0,
+//   sss: 0,
+//   philhealth: 0,
+//   pagibig: 0,
+//   withholding_tax: 0,
+//   sss_loan: 0,
+//   pagibig_loan: 0,
+//   cash_advance: 0,
+//   health_card: 0
+// })
 
-const computeValues = () => {
-  const f = form.value
-  f.gross_pay =
-    f.basic_pay + f.honorarium + f.premium +
-    f.extra_loads + f.overtime - f.late_deduction
+// const computeValues = () => {
+//   const f = form.value
+//   f.gross_pay =
+//     f.basic_pay + f.honorarium + f.premium +
+//     f.extra_loads + f.overtime - f.late_deduction
 
-  f.net_gross_pay =
-    f.gross_pay - (f.sss + f.philhealth + f.pagibig)
+//   f.net_gross_pay =
+//     f.gross_pay - (f.sss + f.philhealth + f.pagibig)
 
-  f.net_pay =
-    f.net_gross_pay -
-    (f.withholding_tax + f.sss_loan + f.pagibig_loan + f.cash_advance + f.health_card)
-}
+//   f.net_pay =
+//     f.net_gross_pay -
+//     (f.withholding_tax + f.sss_loan + f.pagibig_loan + f.cash_advance + f.health_card)
+// }
 
-watch(form, computeValues, { deep: true })
+// watch(form, computeValues, { deep: true })
 
 
 </script>

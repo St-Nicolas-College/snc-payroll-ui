@@ -1,7 +1,7 @@
 <template>
   <!-- Printable area -->
   <div >
-    <PayslipPrint :payslips="payrollDetails.payslips" />
+    <PayslipPrint :payslips="payrollDetails.payslips" :payroll="payrollDetails" />
   </div>
 </template>
 

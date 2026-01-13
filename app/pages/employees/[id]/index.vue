@@ -68,6 +68,20 @@
                 {{ formatCurrency(employee.amount_per_unit) }}
               </v-col>
             </v-row>
+            <v-row dense>
+              <v-col cols="5" class="font-weight-bold">Csco Rate</v-col>
+              <v-col cols="1">:</v-col>
+              <v-col cols="6">
+                {{ formatCurrency(employee.cisco_rate) }}
+              </v-col>
+            </v-row>
+            <v-row dense>
+              <v-col cols="5" class="font-weight-bold">RLE Rate</v-col>
+              <v-col cols="1">:</v-col>
+              <v-col cols="6">
+                {{ formatCurrency(employee.rle_rate) }}
+              </v-col>
+            </v-row>
             <v-list-subheader class="font-weight-bold mt-2">Premiums</v-list-subheader>
             <v-row dense>
               <v-col cols="5" class="font-weight-bold">SSS</v-col>
@@ -88,6 +102,21 @@
               <v-col cols="1">:</v-col>
               <v-col cols="6">
                 {{ formatCurrency(employee.pagibig) }}
+              </v-col>
+            </v-row>
+            <v-list-subheader class="font-weight-bold mt-2">Other Deductions</v-list-subheader>
+            <v-row dense>
+              <v-col cols="5" class="font-weight-bold">SSS Loan</v-col>
+              <v-col cols="1">:</v-col>
+              <v-col cols="6">
+                {{ formatCurrency(employee.sss_loan) }}
+              </v-col>
+            </v-row>
+            <v-row dense>
+              <v-col cols="5" class="font-weight-bold">Pag-Ibig Loan</v-col>
+              <v-col cols="1">:</v-col>
+              <v-col cols="6">
+                {{ formatCurrency(employee.pagibig_loan) }}
               </v-col>
             </v-row>
           </v-card-text>
@@ -167,6 +196,12 @@
                 <template v-slot:[`item.date_applied`]="{ item }">
                   {{ formatDate(item.date_applied) }}
                 </template>
+                <template v-slot:[`item.total_cash_advance_payment`]="{ item }">
+                  {{ formatCurrency(item.total_cash_advance_payment) }}
+                </template>
+                <template v-slot:[`item.remaining_balance`]="{ item }">
+                  {{ formatCurrency(item.remaining_balance) }}
+                </template>
                 <template v-slot:[`item.date_completed`]="{ item }">
                   <div v-if="item.date_completed == null">
                     Not completed
@@ -176,16 +211,17 @@
                   </div>
                 </template>
                 <template v-slot:[`item.cash_advance_status`]="{ item }">
-                  <div v-if="item.cash_advance_status == 'in-progress'">
-                    <v-chip color='warning' text='In Progress' class="text-uppercase" size="small" label></v-chip>
+                  <div v-if="item.cash_advance_status == 'PARTIAL'">
+                    <v-chip color='warning' text='PARTIAL' class="text-uppercase" size="small" label></v-chip>
                   </div>
                   <div v-else>
-                    <v-chip color='success' text='Paid' class="text-uppercase" size="small" label></v-chip>
+                    <v-chip color='success' text='PAID' class="text-uppercase" size="small" label></v-chip>
                   </div>
                 </template>
 
                 <template v-slot:[`item.actions`]="{ item }">
-                  <v-btn icon="mdi-file-cog" variant="text" color="blue-grey"></v-btn>
+                  <v-btn icon="mdi-file-cog" variant="text" color="blue-grey"
+                    @click="openManageCashAdvanceDialog(item)"></v-btn>
                 </template>
               </v-data-table>
             </v-tabs-window-item>
@@ -254,15 +290,19 @@
             <v-divider class="mb-4"></v-divider>
             <p class="font-weight-bold mb-4"><v-icon start>mdi-credit-card-outline</v-icon> Salary Information</p>
             <v-row dense>
-              <v-col cols="12" md="3"><v-text-field hide-details="auto" :rules="[rules.general]" type="number"
+              <v-col cols="12" md="4"><v-text-field hide-details="auto" :rules="[rules.general]" type="number"
                   prefix="₱" label="Basic Pay" v-model="editForm.basic_pay" variant="solo-filled"
                   flat></v-text-field></v-col>
-              <v-col cols="12" md="3"><v-text-field hide-details="auto" type="number" prefix="₱" label="Honorarium"
+              <v-col cols="12" md="4"><v-text-field hide-details="auto" type="number" prefix="₱" label="Honorarium"
                   v-model="editForm.honorarium" variant="solo-filled" flat></v-text-field></v-col>
-              <v-col cols="12" md="3"><v-text-field hide-details="auto" type="number" prefix="₱" label="Premium"
+              <v-col cols="12" md="4"><v-text-field hide-details="auto" type="number" prefix="₱" label="Premium"
                   v-model="editForm.premium" variant="solo-filled" flat></v-text-field></v-col>
-              <v-col cols="12" md="3"><v-text-field hide-details="auto" type="number" prefix="₱" label="Amount Per Unit"
+              <v-col cols="12" md="4"><v-text-field hide-details="auto" type="number" prefix="₱" label="Amount Per Unit"
                   v-model="editForm.amount_per_unit" variant="solo-filled" flat></v-text-field></v-col>
+              <v-col cols="12" md="4"><v-text-field hide-details="auto" type="number" prefix="₱" label="Cisco Rate"
+                  v-model="editForm.cisco_rate" variant="solo-filled" flat></v-text-field></v-col>
+              <v-col cols="12" md="4"><v-text-field hide-details="auto" type="number" prefix="₱" label="RLE Rate"
+                  v-model="editForm.rle_rate" variant="solo-filled" flat></v-text-field></v-col>
             </v-row>
             <v-list-subheader class="font-weight-bold mt-2">Premiums</v-list-subheader>
             <v-row dense>
@@ -272,6 +312,13 @@
                   v-model="editForm.philhealth" variant="solo-filled" flat></v-text-field></v-col>
               <v-col cols="12" md="4"><v-text-field hide-details="auto" type="number" prefix="₱" label="Pag-Ibig"
                   v-model="editForm.pagibig" variant="solo-filled" flat></v-text-field></v-col>
+            </v-row>
+            <v-list-subheader class="font-weight-bold mt-2">Other Deductions</v-list-subheader>
+            <v-row dense>
+              <v-col cols="12" md="6"><v-text-field hide-details="auto" type="number" prefix="₱" label="SSS Loan"
+                  v-model="editForm.sss_loan" variant="solo-filled" flat></v-text-field></v-col>
+              <v-col cols="12" md="6"><v-text-field hide-details="auto" type="number" prefix="₱" label="Pag-Ibig Loan"
+                  v-model="editForm.pagibig_loan" variant="solo-filled" flat></v-text-field></v-col>
             </v-row>
           </v-form>
         </v-card-text>
@@ -370,7 +417,6 @@
                 </v-col>
               </v-row>
 
-
               <v-divider class="mt-2"></v-divider>
               <v-row no-gutters class="my-2">
                 <v-col cols="5" md="3" class="font-weight-bold">Gross Pay</v-col>
@@ -415,8 +461,6 @@
                   </v-row>
                 </v-col>
               </v-row>
-
-
 
               <v-divider class="mt-2"></v-divider>
               <v-row no-gutters class="my-2">
@@ -516,23 +560,149 @@
 
 
     <!-- CASH ADVANCE DIALOG -->
-    <v-dialog v-model="cashAdvanceDialog" width="700">
+    <v-dialog v-model="cashAdvanceDialog" width="500">
       <v-card>
         <v-toolbar><v-toolbar-title>
-            <v-icon start>mdi-plus</v-icon>
-            Add New Cash Advance</v-toolbar-title>
+            <v-icon start>mdi-account-cash</v-icon>
+            Add Cash Advance</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon @click="cashAdvanceDialog = false"><v-icon>mdi-close</v-icon></v-btn>
         </v-toolbar>
-        <v-card-text>
+        <div class="ma-6">
           <v-form ref="addCashAdvanceForm" v-model="formValid" class="mt-2">
-                      <v-row dense>
-              <v-col cols="12" md="4"><v-text-field hide-details="auto" :rules="[rules.general]" label="Employee No"
-                  v-model="editForm.emp_no" variant="solo-filled" flat></v-text-field></v-col>
-              <v-col cols="12" md="8"><v-text-field hide-details="auto" :rules="[rules.general]" label="Employee Name"
-                  v-model="editForm.emp_name" variant="solo-filled" flat></v-text-field></v-col>
-            </v-row>
+            <v-text-field hide-details="auto" :rules="[rules.general]" type="number" prefix="₱" label="Amount"
+              v-model="cashAdvanceForm.amount" variant="solo-filled" flat></v-text-field>
+
+
+            <v-btn prepend-icon="mdi-plus" color="primary" class="mt-6" :loading="loadingCABtn" :disabled="loadingCABtn"
+              @click="createCashAdvance" block>Create</v-btn>
           </v-form>
+        </div>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="manageCashAdvanceDialog" width="900">
+      <v-card>
+        <v-toolbar>
+          <v-toolbar-title>
+            <v-icon start>mdi-account-cash</v-icon>
+            Manage Cash Advance
+          </v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon @click="manageCashAdvanceDialog = false"><v-icon>mdi-close</v-icon></v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-row>
+            <v-col cols="12" md="6">
+              <p class="font-weight-bold mb-4">Cash Advance Details</p>
+
+              <v-row dense>
+                <v-col cols="5" class="font-weight-bold">Date Applied</v-col>
+                <v-col cols="1">:</v-col>
+                <v-col cols="5">
+                  {{ formatDate(cashAdvanceDetails.date_applied) }}
+                </v-col>
+              </v-row>
+              <v-row dense>
+                <v-col cols="5" class="font-weight-bold">Amount</v-col>
+                <v-col cols="1">:</v-col>
+                <v-col cols="5">
+                  {{ formatCurrency(cashAdvanceDetails.cash_advance_amount) }}
+                </v-col>
+              </v-row>
+              <v-row dense>
+                <v-col cols="5" class="font-weight-bold">Total Amount Paid</v-col>
+                <v-col cols="1">:</v-col>
+                <v-col cols="5">
+                  {{ formatCurrency(cashAdvanceDetails.total_cash_advance_payment) }}
+                </v-col>
+              </v-row>
+              <v-row dense>
+                <v-col cols="5" class="font-weight-bold">Remaining Balance</v-col>
+                <v-col cols="1">:</v-col>
+                <v-col cols="6">
+                  {{ formatCurrency(cashAdvanceDetails.remaining_balance) }}
+                </v-col>
+              </v-row>
+              <v-row dense>
+                <v-col cols="5" class="font-weight-bold">Date Updated</v-col>
+                <v-col cols="1">:</v-col>
+                <v-col cols="5">
+                  <div v-if="cashAdvanceDetails.date_updated !== null">
+                    {{ formatDate(cashAdvanceDetails.date_updated) }}
+                  </div>
+                  <div v-else>N/A</div>
+
+                </v-col>
+              </v-row>
+              <v-row dense>
+                <v-col cols="5" class="font-weight-bold">Date Completed</v-col>
+                <v-col cols="1">:</v-col>
+                <v-col cols="5">
+                  <div v-if="cashAdvanceDetails.date_completed !== null">
+                    {{ formatDate(cashAdvanceDetails.date_completed) }}
+                  </div>
+                  <div v-else>
+                    N/A
+                  </div>
+
+                </v-col>
+              </v-row>
+              <v-row dense>
+                <v-col cols="5" class="font-weight-bold">Status</v-col>
+                <v-col cols="1">:</v-col>
+                <v-col cols="5">
+                  <!-- {{ cashAdvanceDetails.cash_advance_status }} -->
+
+                  <div v-if="cashAdvanceDetails.cash_advance_status == 'PARTIAL'">
+                    <v-chip color='warning' text='PARTIAL' class="text-uppercase" size="small" label></v-chip>
+                  </div>
+                  <div v-else>
+                    <v-chip color='success' text='PAID' class="text-uppercase" size="small" label></v-chip>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-divider vertical></v-divider>
+            <v-col cols="12" md="5">
+              <v-row>
+                <v-col cols="12">
+                  <span class="text-overline font-weight-bold">Update cash advance amount</span>
+                  <v-btn v-if="disabledUpdateCA == true" color="warning" variant="text" size="small"
+                    @click="disabledUpdateCA = false" icon><v-icon>mdi-pencil</v-icon></v-btn>
+                  <v-btn v-if="disabledUpdateCA == false" color="error" variant="text" size="small"
+                    @click="disabledUpdateCA = true" icon><v-icon>mdi-close</v-icon></v-btn>
+                  <v-form class="mt-2" ref="updateCashAdvanceForm" v-model="formValid" lazy-validation>
+                    <v-text-field hide-details="auto" :rules="[rules.general]" type="number" prefix="₱" label="Amount"
+                      :disabled="disabledUpdateCA" v-model="cashAdvanceDetails.cash_advance_amount"
+                      variant="solo-filled" flat></v-text-field>
+                    <v-btn color="primary" variant="elevated" class="mt-4" :loading="loadingCABtn"
+                      :disabled="disabledUpdateCA" @click="updateCAAmount()" block>Update
+                      Amount</v-btn>
+                  </v-form>
+                </v-col>
+              </v-row>
+
+            </v-col>
+          </v-row>
+          <v-divider class="mt-5"></v-divider>
+          <v-row>
+            <v-col cols="12">
+              <v-card elevation="0" class="mt-5">
+                <v-card-title>Payment Details</v-card-title>
+
+                <v-data-table density="compact" :headers="caPaymentsHeader"
+                  :items="cashAdvanceDetails.cash_advance_payments">
+                  <template v-slot:[`item.cash_advance_payment`]="{ item }">
+                    {{ formatCurrency(item.cash_advance_payment) }}
+                  </template>
+                  <template v-slot:[`item.payment_date`]="{ item }">
+                    {{ formatDate(item.payment_date) }}
+                  </template>
+                </v-data-table>
+              </v-card>
+            </v-col>
+          </v-row>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -560,12 +730,16 @@ const breadcrumbItems = [
 const updateEmployeeDialog = ref(false)
 const previewPayslipDialog = ref(false);
 const cashAdvanceDialog = ref(false);
+const manageCashAdvanceDialog = ref(false)
 const employee = ref({})
 const payslips = ref([])
 const cashAdvances = ref([])
+const toalCashAdvancePayment = ref([])
 const loading = ref(false)
+const loadingCABtn = ref(false)
 const formValid = ref(null)
 const tab = ref("payslip")
+const disabledUpdateCA = ref(true)
 const headers = [
   { title: 'Payroll Period', key: 'payroll_period' },
   { title: 'Basic Pay', key: 'basic_pay', sortable: false },
@@ -577,15 +751,26 @@ const headers = [
 const headersCashAdvance = [
   { title: 'Amount', key: 'cash_advance_amount' },
   { title: 'Date Applied', key: 'date_applied', sortable: false },
+  { title: 'Total Amount Paid', key: 'total_cash_advance_payment', sortable: false },
+  { title: 'Remaining Balance', key: 'remaining_balance', sortable: false },
   { title: 'Date Completed', key: 'date_completed', sortable: false },
   { title: 'Status', key: 'cash_advance_status', sortable: false },
   { title: '', key: 'actions', align: 'end', sortable: false },
 ]
+const caPaymentsHeader = [
+  { title: 'Amount Paid', key: 'cash_advance_payment' },
+  { title: 'Payment Date', key: 'payment_date' },
+]
 const rules = {
   general: (v) => !!v || "This field is required",
 }
+const addCashAdvanceForm = ref(null)
 const loadingBtn = ref(false)
 const updateEmployeeForm = ref(null)
+const updateCashAdvanceForm = ref(null)
+const cashAdvanceForm = ref({
+  amount: 0
+})
 const editForm = ref({
   emp_no: '',
   emp_name: '',
@@ -595,11 +780,16 @@ const editForm = ref({
   honorarium: 0,
   premium: 0,
   amount_per_unit: 0,
+  cisco_rate: 0,
+  rle_rate: 0,
   sss: 0,
   philhealth: 0,
   pagibig: 0,
+  sss_loan: 0,
+  pagibig_loan: 0
 })
 const payslipDetails = ref({})
+const cashAdvanceDetails = ref({})
 
 const fetchEmployeeDetails = async () => {
   try {
@@ -622,7 +812,30 @@ const fetchEmployeeDetails = async () => {
       //console.log("Successfully fetched..", res.data)
       employee.value = res.data
       payslips.value = res.data.payslips
-      cashAdvances.value = res.data.cash_advances
+      //cashAdvances.value = res.data.cash_advances
+      cashAdvances.value = res.data.cash_advances.map(ca => {
+        const payments = ca.cash_advance_payments || []
+
+        const totalPayment = payments.reduce(
+          (sum, p) => sum + Number(p.cash_advance_payment ?? 0),
+          0
+        )
+
+        const amount = Number(ca.cash_advance_amount ?? 0)
+        const remainingBalance = Number(ca.cash_advance_amount ?? 0) - totalPayment
+
+        let status = 'PENDING'
+        if (remainingBalance === 0) status = 'PAID'
+        else if (remainingBalance <= amount) status = 'PARTIAL'
+
+        return {
+          ...ca,
+          total_cash_advance_payment: totalPayment,
+          remaining_balance: remainingBalance,
+          cash_advance_status: status
+        }
+      })
+      console.log("Total Payment: ", cashAdvances.value)
     }
   } catch (err) {
     console.log('Failed to fetch data.', err)
@@ -640,9 +853,13 @@ function openEditDialog() {
     honorarium: employee.value?.honorarium,
     premium: employee.value?.premium,
     amount_per_unit: employee.value?.amount_per_unit,
+    cisco_rate: employee.value?.cisco_rate,
+    rle_rate: employee.value?.rle_rate,
     sss: employee.value?.sss,
     philhealth: employee.value?.philhealth,
     pagibig: employee.value?.pagibig,
+    sss_loan: employee.value?.sss_loan,
+    pagibig_loan: employee.value?.pagibig_loan,
   }
 
   updateEmployeeDialog.value = true
@@ -669,9 +886,13 @@ const updateEmployee = async () => {
           honorarium: editForm.value?.honorarium,
           premium: editForm.value?.premium,
           amount_per_unit: editForm.value?.amount_per_unit,
+          cisco_rate: editForm.value?.cisco_rate,
+          rle_rate: editForm.value?.rle_rate,
           sss: editForm.value?.sss,
           philhealth: editForm.value?.philhealth,
           pagibig: editForm.value?.pagibig,
+          sss_loan: editForm.value?.sss_loan,
+          pagibig_loan: editForm.value?.pagibig_loan
 
         }
       },
@@ -685,6 +906,84 @@ const updateEmployee = async () => {
     console.error('Error updating..', err)
   } finally {
     loadingBtn.value = false
+  }
+}
+
+// Create Cash Advance
+const createCashAdvance = async () => {
+  loadingCABtn.value = true
+  const isValid = await addCashAdvanceForm.value?.validate();
+  if (isValid.valid) {
+    try {
+      const today = new Date().toISOString().split('T')[0]
+      const data = await $fetch(`${baseUrl}/api/cash-advances`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token.value}`
+        },
+        body: {
+          data: {
+            employee: route.params.id,
+            cash_advance_amount: cashAdvanceForm.value.amount,
+            date_applied: today
+          }
+        }
+      })
+      loadingCABtn.value = false
+      console.log("Successfully Created");
+      alert(`Cash Advance amounting to ${cashAdvanceForm.value.amount} successfully added!`)
+      addCashAdvanceForm.value?.reset()
+      fetchEmployeeDetails();
+      cashAdvanceDialog.value = false
+
+    } catch (err) {
+      loadingCABtn.value = false
+      const message = err?.response?._data?.error?.message || "Unknown error";
+      console.log("Error message: ", message)
+    } finally {
+      loadingCABtn.value = false
+    }
+  }
+}
+
+// Open Manage Cash Advance dialog
+const openManageCashAdvanceDialog = async (item) => {
+  console.log("Cash Advance Details: ", item)
+  cashAdvanceDetails.value = item
+  manageCashAdvanceDialog.value = true
+}
+
+const updateCAAmount = async () => {
+  loadingCABtn.value = true
+  console.log("New Amount: ", Number(cashAdvanceDetails.value.cash_advance_amount))
+  const isValid = await updateCashAdvanceForm.value?.validate();
+  if (isValid.valid) {
+    try {
+      const today = new Date().toISOString().split('T')[0]
+      const data = await $fetch(`${baseUrl}/api/cash-advances/${cashAdvanceDetails.value?.documentId}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token.value}`
+        },
+        body: {
+          data: {
+            cash_advance_amount: Number(cashAdvanceDetails.value.cash_advance_amount),
+            date_updated: today
+          }
+        }
+      })
+      loadingCABtn.value = false
+      disabledUpdateCA.value = true
+      alert(`Cash advance amount update to ${cashAdvanceDetails.value.cash_advance_amount}`)
+      fetchEmployeeDetails();
+    } catch (err) {
+      const message = err?.response?._data?.error?.message || "Unknown error";
+      console.log("Error message: ", message)
+      loadingCABtn.value = false
+    } finally {
+      loadingCABtn.value = false
+    }
+
   }
 }
 

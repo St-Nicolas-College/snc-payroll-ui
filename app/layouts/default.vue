@@ -121,7 +121,7 @@
         <span>Employees</span>
       </v-btn>
 
-      <v-btn to="/settings">
+      <v-btn to="/account-settings">
         <v-icon>mdi-cog</v-icon>
 
         <span>Settings</span>

@@ -147,6 +147,39 @@
       </div>
     </div>
 
+    <v-dialog
+      v-model="downloadDialog"
+      max-width="320"
+      persistent
+    >
+      <v-list
+        class="py-2"
+        color="primary"
+        elevation="12"
+        rounded="lg"
+      >
+        <v-list-item
+          prepend-icon="mdi-download"
+          title="Downloading..."
+        >
+          <template v-slot:prepend>
+            <div class="pe-4">
+              <v-icon color="primary" size="x-large"></v-icon>
+            </div>
+          </template>
+
+          <template v-slot:append>
+            <v-progress-circular
+              color="primary"
+              indeterminate="disable-shrink"
+              size="16"
+              width="2"
+            ></v-progress-circular>
+          </template>
+        </v-list-item>
+      </v-list>
+    </v-dialog>
+
 
   </div>
 </template>
@@ -160,9 +193,14 @@ useHead({
 
 })
 const loading = ref(true)
+const downloadDialog = ref(false)
 const disabledBtn = ref(true)
 const noData = ref(false)
 const props = defineProps({
+  payroll: {
+    type: Object,
+    required: true
+  },
   payslips: {
     type: Array,
     required: true
@@ -259,6 +297,8 @@ const printPreview = async () => {
 
 const downloadPdf = async () => {
   // 1. Define constants for PDF and Print layout
+  console.log("Downloading...")
+  downloadDialog.value = true
   const doc = new jsPDF('p', 'mm', 'a4');
   const width = doc.internal.pageSize.getWidth();
   const height = doc.internal.pageSize.getHeight();
@@ -340,6 +380,8 @@ const downloadPdf = async () => {
     doc.addImage(imgData, "PNG", 0, 0, width, height);
   }
 
+  console.log("Downloaded")
+
   // 4. Save and Clean up
   // doc.autoPrint()
   // var w = 600;
@@ -347,7 +389,9 @@ const downloadPdf = async () => {
   // var left = (window.innerWidth / 2) - (w / 2);
   // var top = (window.innerHeight / 2) - (h / 2);
   // window.open(doc.output('bloburl'), '_blank', 'modal,location=no,menubar=no, scrollbars=no,titlebar=no,toolbar=no,top=' + top + ',left=' + left + ',width=' + w + ',height=' + h + '');
-  doc.save("payslips_2x2_grid.pdf");
+  doc.save(`Payroll(${formatDate(props.payroll.payroll_period_start)} - ${formatDate(props.payroll.payroll_period_end)}).pdf`);
+  console.log("Downloaded 2")
+  downloadDialog.value = false
   pdfPagesContainer.innerHTML = '';
 };
 
