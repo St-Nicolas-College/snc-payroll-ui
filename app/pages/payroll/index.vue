@@ -24,8 +24,20 @@
         <template v-slot:[`item.payroll_period`]="{ item }">
           {{ formatDate(item.payroll_period_start) }} - {{ formatDate(item.payroll_period_end) }}
         </template>
+        <template v-slot:[`item.cut_off_type`]="{ item }">
+          <div v-if="item.cut_off_type == 'first_half'">15th (Kinsenas)</div>
+          <div v-if="item.cut_off_type == 'second_half'">30th (Katapusan)</div>
+        </template>
+
+        <template v-slot:[`item.pay_date`]="{ item }">
+          {{ formatDate(item.pay_date) }}
+        </template>
+
         <template v-slot:[`item.createdAt`]="{ item }">
           {{ formatDate(item.createdAt) }}
+        </template>
+        <template v-slot:[`item.user_info`]="{ item }">
+         {{ item.user_info?.first_name }} {{ item.user_info?.last_name || '-' }}
         </template>
         <template v-slot:[`item.actions`]="{ item }">
 
@@ -46,7 +58,8 @@
       </v-toolbar>
       <v-divider></v-divider>
     </v-card>
-    <v-card v-for="payroll in payrolls" :key="payroll.id" rounded="lg"  class="d-md-none mt-1" elevation="0" :to="`/payroll/${payroll.documentId}`">
+    <v-card v-for="payroll in payrolls" :key="payroll.id" rounded="lg" class="d-md-none mt-1" elevation="0"
+      :to="`/payroll/${payroll.documentId}`">
       <v-card-text class="pa-3">
         <v-row dense>
           <v-col cols="10">
@@ -82,9 +95,20 @@
         </v-toolbar>
         <v-card-text>
           <v-form ref="createPayrollForm" v-model="formValid" class="mt-2" @submit.prevent="createPayroll">
+            <v-radio-group v-model="cutOffType" :rules="[rules.cutOffType]" inline>
+              <template v-slot:label>
+                <div>Cut-off Type</div>
+              </template>
+              <v-radio label="15th" value="first_half"></v-radio>
+              <v-radio label="30th" value="second_half"></v-radio>
+            </v-radio-group>
             <v-date-input prepend-icon="" input-mode="calendar" prepend-inner-icon="mdi-calendar-range"
               :rules="[rules.payrollPeriod]" variant="solo-filled" flat v-model="payrollPeriod"
               :model-modifiers="{ time: false }" label="Payroll Period" multiple="range"></v-date-input>
+
+            <v-date-input prepend-icon="" input-mode="calendar" prepend-inner-icon="mdi-calendar-range"
+              :rules="[rules.payDate]" variant="solo-filled" flat v-model="payDate" :model-modifiers="{ time: false }"
+              label="Pay Date"></v-date-input>
             <v-btn class="mt-2" :loading="loadingBtn" :disabled="loadingBtn" block color="primary" type="submit">Create
               Payroll</v-btn>
           </v-form>
@@ -99,6 +123,7 @@
 </template>
 
 <script setup>
+const { user } = storeToRefs(useMyAuthStore())
 const token = useCookie('token')
 definePageMeta({
   middleware: 'role-check',
@@ -115,8 +140,10 @@ const breadcrumbItems = [
 ]
 const header = [
   { title: 'Payroll Period', key: 'payroll_period', sortable: false },
+  { title: 'Cut-Off Type', key: 'cut_off_type', sortable: false },
+  { title: 'Pay Date', key: 'pay_date', sortable: false },
   { title: 'Created At', key: 'createdAt', sortable: false },
-  { title: 'Created By', key: 'created_by', sortable: false },
+  { title: 'Created By', key: 'user_info', sortable: false },
   { title: 'Actions', key: 'actions', align: 'end', sortable: false },
 ];
 
@@ -127,9 +154,13 @@ const search = ref('')
 const loading = ref(true)
 const createPayrollDialog = ref(false);
 const createPayrollForm = ref(null);
+const cutOffType = ref(null)
 const payrollPeriod = ref(null)
+const payDate = ref(null)
 const rules = {
-  payrollPeriod: (v) => !!v || "this field is required"
+  cutOffType: (v) => !!v || "this field is required",
+  payrollPeriod: (v) => !!v || "this field is required",
+  payDate: (v) => !!v || "this field is required",
 }
 const page = ref(1)
 const pageSize = 10
@@ -177,33 +208,37 @@ const createPayroll = async () => {
 
   try {
 
-    const firstPeriod = payrollPeriod.value[1]
-    const lastPeriod = payrollPeriod.value[payrollPeriod.value?.length - 1]
+    const firstPeriod = formatDateToYYYYMMDD(payrollPeriod.value[0])
+    const lastPeriod = formatDateToYYYYMMDD(payrollPeriod.value[payrollPeriod.value?.length - 1])
     console.log("1st Payroll Period: ", firstPeriod)
     console.log("2nd Payroll Period: ", lastPeriod)
     console.log('Payroll Period: ', payrollPeriod.value)
+    console.log("Cutoff Type: ", cutOffType.value)
+    console.log("Pay Date: ", formatDateToYYYYMMDD(payDate.value))
+    console.log("User: ", user.value?.user_info)
     loadingBtn.value = true;
 
-    const toYMD = (date) => {
-      if (!date) return null
-      return date.split('T')[0]
-    }
-    await $fetch(`${baseUrl}/api/payroll-periods`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      },
-      body: {
-        data: {
-          payroll_period_start: firstPeriod,
-          payroll_period_end: lastPeriod
-        }
+    // await $fetch(`${baseUrl}/api/payroll-periods`, {
+    //   method: 'POST',
+    //   headers: {
+    //     Authorization: `Bearer ${token.value}`
+    //   },
+    //   body: {
+    //     data: {
+    //       payroll_period_start: firstPeriod,
+    //       payroll_period_end: lastPeriod,
+    //       cut_off_type: cutOffType.value,
+    //       pay_date: formatDateToYYYYMMDD(payDate.value)
+    //     }
 
-      }
-    })
+    //   }
+    // })
     loadingBtn.value = false
     createPayrollDialog.value = false
     getPayroll()
+    cutOffType.value = null,
+      payrollPeriod.value = null,
+      payDate.value = null
     alert('Payroll Period successfully created!')
   } catch (err) {
     console.error('Error creating payroll', err);
@@ -221,6 +256,13 @@ const formatDate = (dateStr) => {
     day: "numeric",
   });
 };
+
+const formatDateToYYYYMMDD = (date) => {
+  const year = date.getFullYear()
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const day = date.getDate().toString().padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
 
 watch(page, getPayroll)
 

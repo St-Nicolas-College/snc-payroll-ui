@@ -141,7 +141,7 @@ const props = defineProps({
 })
 const header = [
   { title: 'ID No', key: 'employee.employee_no' },
-  { title: 'Employee Name', key: 'employee.employee_name', align: 'center', sortable: false },
+  { title: 'Employee Name', key: 'employee.employee_name', sortable: false },
   { title: 'Basic Pay', key: 'basic_pay', align: 'center', sortable: false },
   { title: 'Honorarium', key: 'honorarium', align: 'center', sortable: false },
   { title: 'Premium', key: 'premium', align: 'center', sortable: false },

@@ -40,44 +40,83 @@
           <v-card-text>
             <v-row>
               <v-col cols="12" md="12">
-                <v-row>
-                  <v-col cols="12" md="3">
-                    <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                      <v-row dense>
-                        <v-col cols="7" class="font-weight-bold"> Payroll Cover Start:</v-col>
-                        <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_start)
-                        }}</v-col>
-                      </v-row>
-                    </v-card>
+                <v-row dense>
+                  <v-col cols="12" md="4">
+                    <v-row dense>
+                      <v-col cols="12">
+                        <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                          <v-row dense>
+                            <v-col cols="7" class="font-weight-bold"> Payroll Cover Start:</v-col>
+                            <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_start)
+                            }}</v-col>
+                          </v-row>
+                        </v-card>
+                      </v-col>
+                    </v-row>
+                    <v-row dense>
+                      <v-col cols="12">
+                        <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                          <v-row dense>
+                            <v-col cols="7" class="font-weight-bold"> Payroll Cover End:</v-col>
+                            <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_end)
+                            }}</v-col>
+                          </v-row>
+                        </v-card>
+                      </v-col>
+                    </v-row>
                   </v-col>
-
-                  <v-col cols="12" md="3">
-                    <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                      <v-row dense>
-                        <v-col cols="7" class="font-weight-bold"> Payroll Cover End:</v-col>
-                        <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_end)
-                        }}</v-col>
-                      </v-row>
-                    </v-card>
+                  <v-col cols="12" md="4">
+                    <v-row dense>
+                      <v-col cols="12">
+                        <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                          <v-row dense>
+                            <v-col cols="7" class="font-weight-bold"> Pay Date:</v-col>
+                            <v-col cols="5"> {{ formatDate(payrollDetails.pay_date)
+                            }}</v-col>
+                          </v-row>
+                        </v-card>
+                      </v-col>
+                    </v-row>
+                    <v-row dense>
+                      <v-col cols="12">
+                        <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                          <v-row dense>
+                            <v-col cols="7" class="font-weight-bold"> Cut-Off Type:</v-col>
+                            <v-col cols="5">
+                              <div v-if="payrollDetails.cut_off_type == 'first_half'">15th (Kinsenas)</div>
+                              <div v-if="payrollDetails.cut_off_type == 'second_half'">30th (Katapusan)</div>
+                            </v-col>
+                          </v-row>
+                        </v-card>
+                      </v-col>
+                    </v-row>
                   </v-col>
-
-                  <v-col cols="12" md="3">
-                    <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                      <v-row dense>
-                        <v-col cols="7" class="font-weight-bold"> Payroll Created:</v-col>
-                        <v-col cols="5"> {{ formatDate(payrollDetails.createdAt)
-                        }}</v-col>
-                      </v-row>
-                    </v-card>
-                  </v-col>
-
-                  <v-col cols="12" md="3">
-                    <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
-                      <v-row dense>
-                        <v-col cols="7" class="font-weight-bold"> Created By:</v-col>
-                        <v-col cols="5"> </v-col>
-                      </v-row>
-                    </v-card>
+                  <v-col cols="12" md="4">
+                    <v-row dense>
+                      <v-col cols="12">
+                        <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                          <v-row dense>
+                            <v-col cols="7" class="font-weight-bold"> Payroll Created:</v-col>
+                            <v-col cols="5">
+                              {{ formatDate(payrollDetails.createdAt)
+                              }}
+                            </v-col>
+                          </v-row>
+                        </v-card>
+                      </v-col>
+                    </v-row>
+                    <v-row dense>
+                      <v-col cols="12">
+                        <v-card class="bg-grey-lighten-4 pa-3 h-230" elevation="0" rounded="lg">
+                          <v-row dense>
+                            <v-col cols="7" class="font-weight-bold"> Created by:</v-col>
+                            <v-col cols="5">
+                              {{ payrollDetails.user_info?.first_name }} {{ payrollDetails.user_info?.last_name }}
+                            </v-col>
+                          </v-row>
+                        </v-card>
+                      </v-col>
+                    </v-row>
                   </v-col>
                 </v-row>
               </v-col>
@@ -88,6 +127,10 @@
         <v-card elevation="0" rounded="lg" class="mt-5">
           <v-card-title class="d-flex align-center pe-2">
             Grand Total: {{ formatCurrency(totalNetPay) }}
+            <v-spacer></v-spacer>
+            Grand Total (ATM): {{ formatCurrency(totalATMNetPay) }}
+            <v-spacer></v-spacer>
+            Grand Total (Cash): {{ formatCurrency(totalCashNetPay) }}
             <v-spacer></v-spacer>
             <v-spacer></v-spacer>
             <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
@@ -192,6 +235,12 @@
             <h4 class="text-center">{{ formatDate(payrollDetails.payroll_period_start)
             }} - {{ formatDate(payrollDetails.payroll_period_end)
               }}</h4>
+            <div v-if="payrollDetails.cut_off_type == 'first_half'">
+              <h4 class="text-center">15th (Kinsenas)</h4>
+            </div>
+            <div v-if="payrollDetails.cut_off_type == 'second_half'">
+              <h4 class="text-center">30th (Katapusan)</h4>
+            </div>
 
             <v-divider class="my-4"></v-divider>
             <v-form ref="payrollEnlistmentForm" v-model="formValid" lazy-validation>
@@ -512,6 +561,7 @@ useHead({
   title: 'Payroll',
 
 })
+import qs from 'qs';
 import { useDisplay } from 'vuetify'
 const token = useCookie('token')
 const { smAndDown } = useDisplay()
@@ -554,6 +604,8 @@ const payrollEnlistmentForm = ref(null)
 const formValid = ref(true)
 const employees = ref([])
 const payrollDetails = ref({})
+const atmPayslips = ref([])
+const cashPayslips = ref([])
 const createEmployeePayrollDialog = ref(false)
 const payroll_period = route.params.id
 const mode = ref("atm")
@@ -604,15 +656,34 @@ const openEmployeeDialog = async () => {
 }
 
 const fetchPayroll = async () => {
-  const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?populate[payslips][populate]=*`, {
+  // const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?populate[payslips][populate]=*`, {
+  //   headers: {
+  //     Authorization: `Bearer ${token.value}`
+  //   },
+  // })
+  const query = qs.stringify({
+    populate: {
+      payslips: {
+        populate: '*'
+      },
+      user_info: {
+        populate: '*'
+      }
+    }
+  })
+  const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?${query}`, {
+
     headers: {
       Authorization: `Bearer ${token.value}`
     },
   })
   loading.value = false
   payrollDetails.value = res.data;
+  atmPayslips.value = res.data.payslips.filter(p => p.mode === 'atm')
+  cashPayslips.value = res.data.payslips.filter(p => p.mode === 'cash')
   noRecordFound.value = false
-  //console.log('Payroll Details:', res.data)
+  //console.log('Payroll Details ATM:', atmPayslips.value)
+  //console.log('Payroll Details Cash:', cashPayslips.value)
 }
 
 
@@ -936,6 +1007,16 @@ const totalNetPay = computed(() => {
   return payrollDetails.value.payslips.reduce((sum, row) => sum + Number(row.net_pay), 0)
 })
 
+const totalATMNetPay = computed(() => {
+  if (!atmPayslips.value) return 0
+  return atmPayslips.value.reduce((sum, row) => sum + Number(row.net_pay), 0)
+})
+
+const totalCashNetPay = computed(() => {
+  if (!cashPayslips.value) return 0
+  return cashPayslips.value.reduce((sum, row) => sum + Number(row.net_pay), 0)
+})
+
 onMounted(async () => {
   await fetchPayroll();
   //await fetchPayslips();
@@ -946,7 +1027,7 @@ onMounted(async () => {
 
 watch(employee, () => {
   if (employee.value) {
-    console.log('Selected Employee: ', employee.value)
+    //console.log('Selected Employee: ', employee.value)
     employeeName.value = employee.value?.employee_name
     position.value = employee.value?.position
     department.value = employee.value?.department
@@ -965,7 +1046,20 @@ watch(employee, () => {
     //cashAdvanceAmount.value = employee.value?.cash_advance_amount
     //cashAdvanceBalance.value = employee.value?.cash_advance_balance
 
+    if (payrollDetails.value?.cut_off_type === 'first_half') {
+      //console.log("1st Half")
+      sssLoan.value = 0,
+      pagibigLoan.value = 0
+    } else if (payrollDetails.value?.cut_off_type === 'second_half') {
+      //console.log("2nd half")
+      sss.value = 0
+      philhealth.value = 0
+      pagibig.value = 0
+    }
+
   }
+
+
 
 
   // cashAdvanceBalance.value = originalCashAdvanceBalance.value
