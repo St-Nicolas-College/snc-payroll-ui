@@ -48,7 +48,7 @@
                           <v-row dense>
                             <v-col cols="7" class="font-weight-bold"> Payroll Cover Start:</v-col>
                             <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_start)
-                            }}</v-col>
+                              }}</v-col>
                           </v-row>
                         </v-card>
                       </v-col>
@@ -59,7 +59,7 @@
                           <v-row dense>
                             <v-col cols="7" class="font-weight-bold"> Payroll Cover End:</v-col>
                             <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_end)
-                            }}</v-col>
+                              }}</v-col>
                           </v-row>
                         </v-card>
                       </v-col>
@@ -72,7 +72,7 @@
                           <v-row dense>
                             <v-col cols="7" class="font-weight-bold"> Pay Date:</v-col>
                             <v-col cols="5"> {{ formatDate(payrollDetails.pay_date)
-                            }}</v-col>
+                              }}</v-col>
                           </v-row>
                         </v-card>
                       </v-col>
@@ -124,89 +124,190 @@
           </v-card-text>
         </v-card>
 
-        <v-card elevation="0" rounded="lg" class="mt-5">
-          <v-card-title class="d-flex align-center pe-2">
-            Grand Total: {{ formatCurrency(totalNetPay) }}
-            <v-spacer></v-spacer>
-            Grand Total (ATM): {{ formatCurrency(totalATMNetPay) }}
-            <v-spacer></v-spacer>
-            Grand Total (Cash): {{ formatCurrency(totalCashNetPay) }}
-            <v-spacer></v-spacer>
-            <v-spacer></v-spacer>
-            <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
-              variant="solo-filled" flat hide-details single-line></v-text-field>
-          </v-card-title>
+        <v-sheet class="mt-5">
+          <v-tabs color="primary" v-model="payrollDetailsTab">
+            <v-tab value="atm">ATM</v-tab>
+            <v-tab value="cash">CASH</v-tab>
+          </v-tabs>
+
           <v-divider></v-divider>
 
-          <v-data-table density="compact" :items-per-page="-1" :hide-default-footer="false" :headers="header"
-            :items="payrollDetails.payslips" :search="search" :loading="loading">
-            <template v-slot:[`item.basic_pay`]="{ item }">
-              {{ formatCurrency(item.basic_pay) }}
-            </template>
-            <template v-slot:[`item.honorarium`]="{ item }">
-              {{ formatCurrency(item.honorarium) }}
-            </template>
-            <template v-slot:[`item.premium`]="{ item }">
-              {{ formatCurrency(item.premium) }}
-            </template>
-            <template v-slot:[`item.units_total_amount`]="{ item }">
-              {{ formatCurrency(item.units_total_amount) }}
-            </template>
-            <template v-slot:[`item.cisco_total_amount`]="{ item }">
-              {{ formatCurrency(item.cisco_total_amount) }}
-            </template>
-            <template v-slot:[`item.rle_total_amount`]="{ item }">
-              {{ formatCurrency(item.rle_total_amount) }}
-            </template>
-            <template v-slot:[`item.overtime`]="{ item }">
-              {{ formatCurrency(item.overtime) }}
-            </template>
-            <template v-slot:[`item.late_deduction`]="{ item }">
-              {{ formatCurrency(item.late_deduction) }}
-            </template>
-            <template v-slot:[`item.gross_pay`]="{ item }">
-              <div class="font-weight-bold"> {{ formatCurrency(item.gross_pay) }}</div>
-            </template>
-            <template v-slot:[`item.sss`]="{ item }">
-              {{ formatCurrency(item.sss) }}
-            </template>
-            <template v-slot:[`item.philhealth`]="{ item }">
-              {{ formatCurrency(item.philhealth) }}
-            </template>
-            <template v-slot:[`item.pagibig`]="{ item }">
-              {{ formatCurrency(item.pagibig) }}
-            </template>
-            <template v-slot:[`item.net_gross_pay`]="{ item }">
-              <div class="font-weight-bold">{{ formatCurrency(item.net_gross_pay) }}</div>
-            </template>
-            <template v-slot:[`item.withholding_tax`]="{ item }">
-              {{ formatCurrency(item.withholding_tax) }}
-            </template>
-            <template v-slot:[`item.sss_loan`]="{ item }">
-              {{ formatCurrency(item.sss_loan) }}
-            </template>
-            <template v-slot:[`item.pagibig_loan`]="{ item }">
-              {{ formatCurrency(item.pagibig_loan) }}
-            </template>
-            <template v-slot:[`item.cash_advance_deduction`]="{ item }">
-              {{ formatCurrency(item.cash_advance_deduction) }}
-            </template>
-            <template v-slot:[`item.health_card`]="{ item }">
-              {{ formatCurrency(item.health_card) }}
-            </template>
-            <template v-slot:[`item.net_pay`]="{ item }">
-              <div class="font-weight-bold">{{ formatCurrency(item.net_pay) }}</div>
-            </template>
-            <template v-slot:[`item.actions`]="{ item }">
-              <!-- <v-btn size="small" class="mr-1" icon="mdi-account-cog-outline" variant="tonal" color="blue"
+          <v-tabs-window v-model="payrollDetailsTab">
+            <v-tabs-window-item value="atm">
+              <v-card elevation="0" rounded="lg">
+                <v-card-title class="d-flex align-center pe-2">
+                  Grand Total: {{ formatCurrency(totalNetPay) }}
+                  <v-spacer></v-spacer>
+                  Grand Total (ATM): {{ formatCurrency(totalATMNetPay) }}
+                  <v-spacer></v-spacer>
+                  Grand Total (Cash): {{ formatCurrency(totalCashNetPay) }}
+                  <v-spacer></v-spacer>
+                  <v-spacer></v-spacer>
+                  <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
+                    variant="solo-filled" flat hide-details single-line></v-text-field>
+                </v-card-title>
+                <v-divider></v-divider>
+
+                <v-data-table density="compact" :items-per-page="-1" :hide-default-footer="false" :headers="header"
+                  :items="payrollDetails.payslips" :search="search" :loading="loading">
+                  <template v-slot:[`item.basic_pay`]="{ item }">
+                    {{ formatCurrency(item.basic_pay) }}
+                  </template>
+                  <template v-slot:[`item.honorarium`]="{ item }">
+                    {{ formatCurrency(item.honorarium) }}
+                  </template>
+                  <template v-slot:[`item.premium`]="{ item }">
+                    {{ formatCurrency(item.premium) }}
+                  </template>
+                  <template v-slot:[`item.units_total_amount`]="{ item }">
+                    {{ formatCurrency(item.units_total_amount) }}
+                  </template>
+                  <template v-slot:[`item.cisco_total_amount`]="{ item }">
+                    {{ formatCurrency(item.cisco_total_amount) }}
+                  </template>
+                  <template v-slot:[`item.rle_total_amount`]="{ item }">
+                    {{ formatCurrency(item.rle_total_amount) }}
+                  </template>
+                  <template v-slot:[`item.overtime`]="{ item }">
+                    {{ formatCurrency(item.overtime) }}
+                  </template>
+                  <template v-slot:[`item.late_deduction`]="{ item }">
+                    {{ formatCurrency(item.late_deduction) }}
+                  </template>
+                  <template v-slot:[`item.gross_pay`]="{ item }">
+                    <div class="font-weight-bold"> {{ formatCurrency(item.gross_pay) }}</div>
+                  </template>
+                  <template v-slot:[`item.sss`]="{ item }">
+                    {{ formatCurrency(item.sss) }}
+                  </template>
+                  <template v-slot:[`item.philhealth`]="{ item }">
+                    {{ formatCurrency(item.philhealth) }}
+                  </template>
+                  <template v-slot:[`item.pagibig`]="{ item }">
+                    {{ formatCurrency(item.pagibig) }}
+                  </template>
+                  <template v-slot:[`item.net_gross_pay`]="{ item }">
+                    <div class="font-weight-bold">{{ formatCurrency(item.net_gross_pay) }}</div>
+                  </template>
+                  <template v-slot:[`item.withholding_tax`]="{ item }">
+                    {{ formatCurrency(item.withholding_tax) }}
+                  </template>
+                  <template v-slot:[`item.sss_loan`]="{ item }">
+                    {{ formatCurrency(item.sss_loan) }}
+                  </template>
+                  <template v-slot:[`item.pagibig_loan`]="{ item }">
+                    {{ formatCurrency(item.pagibig_loan) }}
+                  </template>
+                  <template v-slot:[`item.cash_advance_deduction`]="{ item }">
+                    {{ formatCurrency(item.cash_advance_deduction) }}
+                  </template>
+                  <template v-slot:[`item.health_card`]="{ item }">
+                    {{ formatCurrency(item.health_card) }}
+                  </template>
+                  <template v-slot:[`item.net_pay`]="{ item }">
+                    <div class="font-weight-bold">{{ formatCurrency(item.net_pay) }}</div>
+                  </template>
+                  <template v-slot:[`item.actions`]="{ item }">
+                    <!-- <v-btn size="small" class="mr-1" icon="mdi-account-cog-outline" variant="tonal" color="blue"
               :to="`/employees/${item.documentId}`"></v-btn> -->
-              <v-btn size="small" class="mr-1" variant="tonal" color="info"
-                :to="`/payroll/${route.params.id}/manage/${item.documentId}`"><v-icon>mdi-account-cog-outline</v-icon></v-btn>
+                    <v-btn size="small" class="mr-1" variant="tonal" color="info"
+                      :to="`/payroll/${route.params.id}/manage/${item.documentId}`"><v-icon>mdi-account-cog-outline</v-icon></v-btn>
+                  </template>
+                </v-data-table>
 
-            </template>
-          </v-data-table>
+              </v-card>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="cash">
+              <v-card elevation="0" rounded="lg">
+                <v-card-title class="d-flex align-center pe-2">
+                  Grand Total: {{ formatCurrency(totalNetPay) }}
+                  <v-spacer></v-spacer>
+                  Grand Total (ATM): {{ formatCurrency(totalATMNetPay) }}
+                  <v-spacer></v-spacer>
+                  Grand Total (Cash): {{ formatCurrency(totalCashNetPay) }}
+                  <v-spacer></v-spacer>
+                  <v-spacer></v-spacer>
+                  <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
+                    variant="solo-filled" flat hide-details single-line></v-text-field>
+                </v-card-title>
+                <v-divider></v-divider>
 
-        </v-card>
+                <v-data-table density="compact" :items-per-page="-1" :hide-default-footer="false" :headers="header"
+                  :items="payrollDetails.payslips" :search="search" :loading="loading">
+                  <template v-slot:[`item.basic_pay`]="{ item }">
+                    {{ formatCurrency(item.basic_pay) }}
+                  </template>
+                  <template v-slot:[`item.honorarium`]="{ item }">
+                    {{ formatCurrency(item.honorarium) }}
+                  </template>
+                  <template v-slot:[`item.premium`]="{ item }">
+                    {{ formatCurrency(item.premium) }}
+                  </template>
+                  <template v-slot:[`item.units_total_amount`]="{ item }">
+                    {{ formatCurrency(item.units_total_amount) }}
+                  </template>
+                  <template v-slot:[`item.cisco_total_amount`]="{ item }">
+                    {{ formatCurrency(item.cisco_total_amount) }}
+                  </template>
+                  <template v-slot:[`item.rle_total_amount`]="{ item }">
+                    {{ formatCurrency(item.rle_total_amount) }}
+                  </template>
+                  <template v-slot:[`item.overtime`]="{ item }">
+                    {{ formatCurrency(item.overtime) }}
+                  </template>
+                  <template v-slot:[`item.late_deduction`]="{ item }">
+                    {{ formatCurrency(item.late_deduction) }}
+                  </template>
+                  <template v-slot:[`item.gross_pay`]="{ item }">
+                    <div class="font-weight-bold"> {{ formatCurrency(item.gross_pay) }}</div>
+                  </template>
+                  <template v-slot:[`item.sss`]="{ item }">
+                    {{ formatCurrency(item.sss) }}
+                  </template>
+                  <template v-slot:[`item.philhealth`]="{ item }">
+                    {{ formatCurrency(item.philhealth) }}
+                  </template>
+                  <template v-slot:[`item.pagibig`]="{ item }">
+                    {{ formatCurrency(item.pagibig) }}
+                  </template>
+                  <template v-slot:[`item.net_gross_pay`]="{ item }">
+                    <div class="font-weight-bold">{{ formatCurrency(item.net_gross_pay) }}</div>
+                  </template>
+                  <template v-slot:[`item.withholding_tax`]="{ item }">
+                    {{ formatCurrency(item.withholding_tax) }}
+                  </template>
+                  <template v-slot:[`item.sss_loan`]="{ item }">
+                    {{ formatCurrency(item.sss_loan) }}
+                  </template>
+                  <template v-slot:[`item.pagibig_loan`]="{ item }">
+                    {{ formatCurrency(item.pagibig_loan) }}
+                  </template>
+                  <template v-slot:[`item.cash_advance_deduction`]="{ item }">
+                    {{ formatCurrency(item.cash_advance_deduction) }}
+                  </template>
+                  <template v-slot:[`item.health_card`]="{ item }">
+                    {{ formatCurrency(item.health_card) }}
+                  </template>
+                  <template v-slot:[`item.net_pay`]="{ item }">
+                    <div class="font-weight-bold">{{ formatCurrency(item.net_pay) }}</div>
+                  </template>
+                  <template v-slot:[`item.actions`]="{ item }">
+                    <!-- <v-btn size="small" class="mr-1" icon="mdi-account-cog-outline" variant="tonal" color="blue"
+              :to="`/employees/${item.documentId}`"></v-btn> -->
+                    <v-btn size="small" class="mr-1" variant="tonal" color="info"
+                      :to="`/payroll/${route.params.id}/manage/${item.documentId}`"><v-icon>mdi-account-cog-outline</v-icon></v-btn>
+
+                  </template>
+                </v-data-table>
+
+              </v-card>
+            </v-tabs-window-item>
+
+          </v-tabs-window>
+        </v-sheet>
+
+
+
 
       </div>
 
@@ -233,7 +334,7 @@
 
             <h3 class="text-center">Payroll Period</h3>
             <h4 class="text-center">{{ formatDate(payrollDetails.payroll_period_start)
-            }} - {{ formatDate(payrollDetails.payroll_period_end)
+              }} - {{ formatDate(payrollDetails.payroll_period_end)
               }}</h4>
             <div v-if="payrollDetails.cut_off_type == 'first_half'">
               <h4 class="text-center">15th (Kinsenas)</h4>
@@ -597,6 +698,7 @@ const header = [
   { title: 'Net Pay', key: 'net_pay', sortable: false },
   { title: 'Actions', key: 'actions', align: 'end', sortable: false },
 ];
+const payrollDetailsTab = ref("atm")
 const noRecordFound = ref(true)
 const search = ref('')
 const loading = ref(true)
@@ -1049,7 +1151,7 @@ watch(employee, () => {
     if (payrollDetails.value?.cut_off_type === 'first_half') {
       //console.log("1st Half")
       sssLoan.value = 0,
-      pagibigLoan.value = 0
+        pagibigLoan.value = 0
     } else if (payrollDetails.value?.cut_off_type === 'second_half') {
       //console.log("2nd half")
       sss.value = 0
