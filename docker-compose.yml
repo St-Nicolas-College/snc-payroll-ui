@@ -1,5 +1,5 @@
 services:
-  snc-payroll-system:
+  snc-payroll-ui:
     build:
       context: .
       dockerfile: Dockerfile
