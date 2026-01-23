@@ -218,21 +218,21 @@ const createPayroll = async () => {
     console.log("User: ", user.value?.user_info)
     loadingBtn.value = true;
 
-    // await $fetch(`${baseUrl}/api/payroll-periods`, {
-    //   method: 'POST',
-    //   headers: {
-    //     Authorization: `Bearer ${token.value}`
-    //   },
-    //   body: {
-    //     data: {
-    //       payroll_period_start: firstPeriod,
-    //       payroll_period_end: lastPeriod,
-    //       cut_off_type: cutOffType.value,
-    //       pay_date: formatDateToYYYYMMDD(payDate.value)
-    //     }
+    await $fetch(`${baseUrl}/api/payroll-periods`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token.value}`
+      },
+      body: {
+        data: {
+          payroll_period_start: firstPeriod,
+          payroll_period_end: lastPeriod,
+          cut_off_type: cutOffType.value,
+          pay_date: formatDateToYYYYMMDD(payDate.value)
+        }
 
-    //   }
-    // })
+      }
+    })
     loadingBtn.value = false
     createPayrollDialog.value = false
     getPayroll()

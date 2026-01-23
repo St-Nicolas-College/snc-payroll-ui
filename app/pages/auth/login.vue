@@ -80,7 +80,7 @@ const { errorMessage } = storeToRefs(useMyAuthStore())
 //Major: Breaking changes
 //Minor: New Features, backward compatible
 //Patch: Bug fixes only
-const version = ref("1.18.5") //Major.Minor.Patch
+const version = ref("1.18.6") //Major.Minor.Patch
 const username = ref("");
 const password = ref("");
 const user = ref({
