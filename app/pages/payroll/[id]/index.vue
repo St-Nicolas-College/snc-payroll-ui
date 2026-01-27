@@ -16,13 +16,37 @@
                   Payroll Details
                 </span>
               </v-col>
+             
 
               <!-- RIGHT: ACTION BUTTONS -->
               <v-col cols="12" md="6" class="d-flex justify-end" :class="smAndDown ? 'flex-column ga-2' : 'ga-2'">
-                <v-btn color="info" class="text-capitalize" prepend-icon="mdi-printer" :block="smAndDown"
+                <v-menu open-on-hover>
+                  <template v-slot:activator="{ props }">
+                    <v-btn prepend-icon="mdi-printer" class="text-capitalize" color="info" v-bind="props">
+                      Print Payroll
+                    </v-btn>
+                  </template>
+
+                  <v-list density="compact" class="py-0" item-props slim>
+                    <v-list-item @click="openPrintPayrollWindow('atm')">
+                      <template v-slot:prepend>
+                        <v-icon>mdi-credit-card</v-icon>
+                      </template>
+                      <v-list-item-title>ATM</v-list-item-title>
+                    </v-list-item>
+                    <v-divider></v-divider>
+                    <v-list-item @click="openPrintPayrollWindow('cash')">
+                      <template v-slot:prepend>
+                        <v-icon>mdi-cash</v-icon>
+                      </template>
+                      <v-list-item-title>Cash</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+                <!-- <v-btn color="info" class="text-capitalize" prepend-icon="mdi-printer" :block="smAndDown"
                   @click="openPrintPayrollWindow">
                   Print Payroll
-                </v-btn>
+                </v-btn> -->
 
                 <v-btn color="teal" class="text-capitalize" prepend-icon="mdi-printer" :block="smAndDown"
                   @click="openPrintPayslipWindow">
@@ -136,11 +160,11 @@
             <v-tabs-window-item value="atm">
               <v-card elevation="0" rounded="lg">
                 <v-card-title class="d-flex align-center pe-2">
-                  Grand Total: {{ formatCurrency(totalNetPay) }}
-                  <v-spacer></v-spacer>
+                  <!-- Grand Total: {{ formatCurrency(totalNetPay) }}
+                  <v-spacer></v-spacer> -->
                   Grand Total (ATM): {{ formatCurrency(totalATMNetPay) }}
-                  <v-spacer></v-spacer>
-                  Grand Total (Cash): {{ formatCurrency(totalCashNetPay) }}
+                  <!-- <v-spacer></v-spacer>
+                  Grand Total (Cash): {{ formatCurrency(totalCashNetPay) }} -->
                   <v-spacer></v-spacer>
                   <v-spacer></v-spacer>
                   <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
@@ -149,7 +173,7 @@
                 <v-divider></v-divider>
 
                 <v-data-table density="compact" :items-per-page="-1" :hide-default-footer="false" :headers="header"
-                  :items="payrollDetails.payslips" :search="search" :loading="loading">
+                  :items="atmPayslips" :search="search" :loading="loading">
                   <template v-slot:[`item.basic_pay`]="{ item }">
                     {{ formatCurrency(item.basic_pay) }}
                   </template>
@@ -220,10 +244,10 @@
             <v-tabs-window-item value="cash">
               <v-card elevation="0" rounded="lg">
                 <v-card-title class="d-flex align-center pe-2">
-                  Grand Total: {{ formatCurrency(totalNetPay) }}
-                  <v-spacer></v-spacer>
-                  Grand Total (ATM): {{ formatCurrency(totalATMNetPay) }}
-                  <v-spacer></v-spacer>
+                  <!-- Grand Total: {{ formatCurrency(totalNetPay) }}
+                  <v-spacer></v-spacer> -->
+                  <!-- Grand Total (ATM): {{ formatCurrency(totalATMNetPay) }}
+                  <v-spacer></v-spacer> -->
                   Grand Total (Cash): {{ formatCurrency(totalCashNetPay) }}
                   <v-spacer></v-spacer>
                   <v-spacer></v-spacer>
@@ -233,7 +257,7 @@
                 <v-divider></v-divider>
 
                 <v-data-table density="compact" :items-per-page="-1" :hide-default-footer="false" :headers="header"
-                  :items="payrollDetails.payslips" :search="search" :loading="loading">
+                  :items="cashPayslips" :search="search" :loading="loading">
                   <template v-slot:[`item.basic_pay`]="{ item }">
                     {{ formatCurrency(item.basic_pay) }}
                   </template>
@@ -675,6 +699,7 @@ const breadcrumbItems = [
 ];
 const header = [
   // { title: 'Payroll Period', key: 'name' },
+  { title: 'Mode', key: 'mode', sortable: false },
   { title: 'ID No', key: 'employee.employee_no', sortable: false },
   { title: 'Employee Name', key: 'employee.employee_name', sortable: false },
   { title: 'Basic Pay', key: 'basic_pay', sortable: false },
@@ -696,6 +721,7 @@ const header = [
   { title: 'Cash Advance', key: 'cash_advance_deduction', sortable: false },
   { title: 'Health Card', key: 'health_card', sortable: false },
   { title: 'Net Pay', key: 'net_pay', sortable: false },
+
   { title: 'Actions', key: 'actions', align: 'end', sortable: false },
 ];
 const payrollDetailsTab = ref("atm")
@@ -757,7 +783,7 @@ const openEmployeeDialog = async () => {
   createEmployeePayrollDialog.value = true
 }
 
-const fetchPayroll = async () => {
+const fetchPayroll = async (mode) => {
   // const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?populate[payslips][populate]=*`, {
   //   headers: {
   //     Authorization: `Bearer ${token.value}`
@@ -766,6 +792,11 @@ const fetchPayroll = async () => {
   const query = qs.stringify({
     populate: {
       payslips: {
+        // filters: {
+        //   mode: {
+        //     $eq: 'atm'
+        //   }
+        // },
         populate: '*'
       },
       user_info: {
@@ -784,7 +815,7 @@ const fetchPayroll = async () => {
   atmPayslips.value = res.data.payslips.filter(p => p.mode === 'atm')
   cashPayslips.value = res.data.payslips.filter(p => p.mode === 'cash')
   noRecordFound.value = false
-  //console.log('Payroll Details ATM:', atmPayslips.value)
+  // console.log('Payroll Details ATM:', atmPayslips.value)
   //console.log('Payroll Details Cash:', cashPayslips.value)
 }
 
@@ -800,8 +831,9 @@ const fetchEmployee = async () => {
 
 
 // Open a new window for payroll printing
-const openPrintPayrollWindow = () => {
-  const url = `/payroll/${route.params.id}/report`
+const openPrintPayrollWindow = (mode) => {
+  console.log("Mode: ", mode)
+  const url = `/payroll/${route.params.id}/report?mode=${mode}`
   const width = 1024
   const height = 800
 
