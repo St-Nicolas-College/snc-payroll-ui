@@ -223,7 +223,7 @@
                     {{ formatCurrency(item.pagibig_loan) }}
                   </template>
                   <template v-slot:[`item.cash_advance_deduction`]="{ item }">
-                    {{ formatCurrency(item.cash_advance_deduction) }}
+                    {{ formatCurrency(item.cash_advance_payment?.cash_advance_payment || 0) }}
                   </template>
                   <template v-slot:[`item.health_card`]="{ item }">
                     {{ formatCurrency(item.health_card) }}
@@ -307,7 +307,7 @@
                     {{ formatCurrency(item.pagibig_loan) }}
                   </template>
                   <template v-slot:[`item.cash_advance_deduction`]="{ item }">
-                    {{ formatCurrency(item.cash_advance_deduction) }}
+                    {{ formatCurrency(item.cash_advance_payment?.cash_advance_payment || 0) }}
                   </template>
                   <template v-slot:[`item.health_card`]="{ item }">
                     {{ formatCurrency(item.health_card) }}
@@ -682,9 +682,14 @@
 </template>
 
 <script setup>
+const { $api } = useNuxtApp();
 useHead({
   title: 'Payroll',
 
+})
+definePageMeta({
+    requiresAuth: true,
+  roles: ['Admin', 'Manager']
 })
 import qs from 'qs';
 import { useDisplay } from 'vuetify'
@@ -804,11 +809,9 @@ const fetchPayroll = async (mode) => {
       }
     }
   })
-  const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?${query}`, {
+  const res = await $api(`/payroll-periods/${route.params.id}?${query}`, {
 
-    headers: {
-      Authorization: `Bearer ${token.value}`
-    },
+    credentials: 'include'
   })
   loading.value = false
   payrollDetails.value = res.data;
@@ -821,10 +824,8 @@ const fetchPayroll = async (mode) => {
 
 
 const fetchEmployee = async () => {
-  const res = await $fetch(`${baseUrl}/api/employees?populate=*`, {
-    headers: {
-      Authorization: `Bearer ${token.value}`
-    },
+  const res = await $api(`/employees?populate=*`, {
+    credentials: 'include'
   });
   employees.value = res.data
 }
@@ -985,11 +986,9 @@ const submitForm = async () => {
 
       // STEP 1: Creating Payslip
       //console.log("Processing payslip..")
-      const payslip = await $fetch(`${baseUrl}/api/payslips`, {
+      const payslip = await $api(`/payslips`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token.value}`
-        },
+        credentials: 'include',
         body: payload,
       })
 
@@ -1002,11 +1001,9 @@ const submitForm = async () => {
       //console.log("Selected Cash Advance: ", selectedCashAdvanceId.value)
       if (selectedCashAdvanceId.value !== null) {
         //console.log("Processing cash advance..", payslipId.value)
-        await $fetch(`${baseUrl}/api/cash-advance-payments`, {
+        await $api(`/cash-advance-payments`, {
           method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token.value}`
-          },
+          credentials: 'include',
           body: {
             data: {
               cash_advance: selectedCashAdvanceId.value,
@@ -1045,11 +1042,9 @@ const submitForm = async () => {
       // Rollback payslip if step 2 failed
       if (payslipId.value) {
         try {
-          await $fetch(`${baseUrl}/api/payslips/${payslipId.value}`, {
+          await $api(`/payslips/${payslipId.value}`, {
             method: 'DELETE',
-            headers: {
-              Authorization: `Bearer ${token.value}`
-            },
+            credentials: 'include'
           })
           console.warn('Payslip rolled back')
         } catch (rollbackError) {

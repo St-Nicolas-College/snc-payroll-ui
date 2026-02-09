@@ -1,34 +1,24 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-const userStore = useMyAuthStore();
-const userRole = userStore.user?.role?.name
-//console.log("Global middleware")
-if (!userStore.user) {
-    await userStore.fetchUser();
-}
-if (!userStore.user && to.path !== "/auth/login") {
-    return navigateTo("/auth/login");
-}
+const auth = useAuthStore()
 
-if (userStore.user && to.path === '/auth/login') {
-    return navigateTo("/");
-}
+  // 🛑 WAIT FOR REFRESH FIRST
+  if (!auth.isReady) {
+    await auth.refresh()
+  }
 
-if (userRole === 'Admin' && !to.path.startsWith("/admin")) {
-    return navigateTo("/admin")
-}
+  // 🔐 Protected routes
+  if (to.meta.requiresAuth && !auth.isLoggedIn) {
+    return navigateTo('/auth/login')
+  }
 
-const requiredRole = to.meta.requiredRole;
-const actualRole = userRole;
+  // 🚫 Prevent logged-in users from seeing login
+  if (to.path === '/auth/login' && auth.isLoggedIn) {
+    return navigateTo('/')
+  }
 
-//console.log("redirect to pages", userRole)
-if (requiredRole) {
-    const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-
-    if (!allowedRoles.includes(actualRole)) {
-        if (actualRole === 'Admin') return navigateTo("/admin");
-        if (actualRole === 'Staff') return navigateTo("/");
-        return navigateTo("/")
-    }
-}
-
+  // 🛡 Role-based access
+  //@ts-ignore
+  if (to.meta.roles && !to.meta.roles.includes(auth.role)) {
+    return navigateTo('/unauthorized')
+  }
 })

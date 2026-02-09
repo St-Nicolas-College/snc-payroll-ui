@@ -522,7 +522,7 @@
                     <v-col cols="5">CA Deduction</v-col>
                     <v-col cols="1">:</v-col>
                     <v-col cols="6">
-                      {{ formatCurrency(payslipDetails.cash_advance_deduction) }}
+                      {{ formatCurrency(payslipDetails.cash_advance_payment?.cash_advance_payment || 0) }}
                     </v-col>
                   </v-row>
                   <v-row no-gutters>
@@ -710,10 +710,12 @@
 </template>
 
 <script setup>
+const auth = useAuthStore();
+const { $api } = useNuxtApp();
 import qs from 'qs';
 definePageMeta({
-  middleware: 'role-check',
-  allowedRoles: ['Staff']
+  requiresAuth: true,
+  roles: ['Admin', 'Staff']
 })
 useHead({
   title: 'Employee Details',
@@ -796,17 +798,15 @@ const fetchEmployeeDetails = async () => {
     const query = qs.stringify({
       populate: {
         payslips: {
-          populate: ['payroll_period']
+          populate: ['payroll_period', 'cash_advance_payment']
         },
         cash_advances: {
           populate: '*'
         }
       }
     })
-    const res = await $fetch(`${baseUrl}/api/employees/${route.params.id}?${query}`, {
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      }
+    const res = await $api(`/employees/${route.params.id}?${query}`, {
+      credentials: 'include'
     })
     if (res) {
       //console.log("Successfully fetched..", res.data)
@@ -871,11 +871,9 @@ const updateEmployee = async () => {
   if (!valid) return
   try {
 
-    await $fetch(`${baseUrl}/api/employees/${route.params.id}`, {
+    await $api(`/employees/${route.params.id}`, {
       method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      },
+      credentials: 'include',
       body: {
         data: {
           employee_no: editForm.value.emp_no,
@@ -916,11 +914,9 @@ const createCashAdvance = async () => {
   if (isValid.valid) {
     try {
       const today = new Date().toISOString().split('T')[0]
-      const data = await $fetch(`${baseUrl}/api/cash-advances`, {
+      const data = await $api(`/cash-advances`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token.value}`
-        },
+        credentials: 'include',
         body: {
           data: {
             employee: route.params.id,
@@ -960,11 +956,9 @@ const updateCAAmount = async () => {
   if (isValid.valid) {
     try {
       const today = new Date().toISOString().split('T')[0]
-      const data = await $fetch(`${baseUrl}/api/cash-advances/${cashAdvanceDetails.value?.documentId}`, {
+      const data = await $api(`/cash-advances/${cashAdvanceDetails.value?.documentId}`, {
         method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token.value}`
-        },
+        credentials: 'include',
         body: {
           data: {
             cash_advance_amount: Number(cashAdvanceDetails.value.cash_advance_amount),

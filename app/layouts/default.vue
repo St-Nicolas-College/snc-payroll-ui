@@ -7,19 +7,21 @@
         </div>
         <v-divider></v-divider>
         <v-list density="compact" nav>
-          <!-- <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard" value="dashboard" :to="'/'" class="mb-2"
+          <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard" value="dashboard" :to="'/'" class="mb-2"
             active-class="v-list-item--active-custom">
           </v-list-item>
-          <v-list-item prepend-icon="mdi-cash-sync" title="Payroll" value="payroll" :to="'/payroll'"
+          <v-list-item v-if="auth.role === 'Admin'" prepend-icon="mdi-cash-sync" title="Payroll" value="payroll" :to="'/payroll'"
             :active="$route.path.startsWith('/payroll')" class="mb-2" active-class="v-list-item--active-custom">
           </v-list-item>
           <v-list-item prepend-icon="mdi-account-group" title="Employees" value="employees" to="/employees"
-            active-class="v-list-item--active-custom" :active="$route.path.startsWith('/employees')"></v-list-item> -->
+            active-class="v-list-item--active-custom" :active="$route.path.startsWith('/employees')"></v-list-item>
 
-          <v-list-item v-for="link in visibleLinks" :key="link.title" :to="link.to" :prepend-icon="link.icon"
+          <!-- <v-list-item v-for="link in visibleLinks" :key="link.title" :to="link.to" :prepend-icon="link.icon"
             :title="link.title" active-class="v-list-item--active-custom">
 
-          </v-list-item>
+          </v-list-item> -->
+
+
         </v-list>
 
         <template v-slot:append v-if="drawer">
@@ -33,9 +35,13 @@
               </v-col>
               <v-col class="py-0">
                 <div class="font-weight-medium text-body-2">
-                  {{ user?.user_info?.first_name }} {{ user?.user_info?.last_name }}
+                  <!-- {{ user?.user_info?.first_name }} {{ user?.user_info?.last_name }} -->
+                  {{ auth.user?.user_info?.first_name }}  {{ auth.user?.user_info?.last_name }}
                 </div>
-                <div class="text-caption text-grey">{{ user?.user_info?.position }}</div>
+                <div class="text-caption text-grey">
+                  <!-- {{ user?.user_info?.position }} -->
+                    {{ auth.user?.user_info?.position }}
+                </div>
               </v-col>
               <v-col cols="12">
                 <v-btn color="red-darken-3" variant="tonal" block size="small" @click="handleLogout()">
@@ -133,10 +139,13 @@
 <script setup>
 import { useTheme } from "vuetify";
 import { useDisplay } from "vuetify/lib/composables/display.mjs";
+const auth = useAuthStore();
+const { $api } = useNuxtApp();
+
 const { smAndDown } = useDisplay()
-const { logUserOut } = useMyAuthStore()
-const { user } = storeToRefs(useMyAuthStore())
-const userStore = useMyAuthStore();
+//const { logUserOut } = useMyAuthStore()
+// const { user } = storeToRefs(useMyAuthStore())
+// const userStore = useMyAuthStore();
 const links = [
   {
     title: "Dashboard",
@@ -165,11 +174,12 @@ const theme = useTheme();
 theme.change('light')
 
 
-const visibleLinks = computed(() => {
-  return links.filter((link) => link.roles.includes(userStore.role))
-})
+// const visibleLinks = computed(() => {
+//   return links.filter((link) => link.roles.includes(userStore.role))
+// })
 
-const userInitial = ref(user.value.user_info?.first_name.substring(0, 1) + user.value.user_info?.last_name.substring(0, 1))
+//const userInitial = ref(user.value.user_info?.first_name.substring(0, 1) + user.value.user_info?.last_name.substring(0, 1))
+const userInitial = ref(auth.user?.user_info?.first_name.substring(0, 1) + auth.user?.user_info?.last_name.substring(0, 1))
 
 // Function to toggle between dark and light themes
 function toggleTheme() {
@@ -179,10 +189,13 @@ function toggleTheme() {
   theme.change(isDark ? 'light' : 'dark')
 }
 
-const handleLogout = () => {
-  logUserOut();
-  //router.push("/auth/login")
-  window.location.href = "/auth/login";
+const handleLogout = async () => {
+ await $api('/auth/logout', {
+    method: 'POST',
+    credentials: 'include'
+  });
+  auth.clear();
+  navigateTo('/auth/login')
 };
 
 watch(mobile, (isMobile) => {

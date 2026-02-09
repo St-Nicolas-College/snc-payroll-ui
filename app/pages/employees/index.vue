@@ -121,6 +121,8 @@
 </template>
 
 <script setup>
+const auth = useAuthStore();
+const { $api } = useNuxtApp();
 useHead({
   title: 'Employees',
 
@@ -128,8 +130,8 @@ useHead({
 const token = useCookie('token')
 const baseUrl = useRuntimeConfig().public.strapiUrl
 definePageMeta({
-  middleware: 'role-check',
-  allowedRoles: ['Staff']
+  requiresAuth: true,
+  roles: ['Admin', 'Staff']
 })
 const breadcrumbItems = [
   { text: 'Dashboard', to: '/', icon: 'mdi-home-outline' },
@@ -190,20 +192,16 @@ const openPayrollDialog = async (item) => {
 }
 
 const fetchPayroll = async () => {
-  const res = await $fetch(`${baseUrl}/api/payroll-periods`, {
-    headers: {
-      Authorization: `Bearer ${token.value}`
-    },
+  const res = await $api(`/payroll-periods`, {
+    credentials: 'include'
   });
   payroll.value = res.data
 }
 
 const getUsers = async () => {
   try {
-    const res = await $fetch(`${baseUrl}/api/employees?populate=*`, {
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      },
+    const res = await $api(`/employees?populate=*`, {
+      credentials: 'include'
     })
 
     if (res) {
@@ -246,11 +244,9 @@ const createEmployee = async () => {
       }
 
 
-      await $fetch(`${baseUrl}/api/employees`, {
+      await $api(`/employees`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token.value}`
-        },
+        credentials: 'include',
         body: payload
       })
 

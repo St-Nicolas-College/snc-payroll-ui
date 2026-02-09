@@ -12,11 +12,11 @@
         <h2 class="text-center font-weight-bold mb-6">Welcome Back!</h2>
 
         <v-form v-model="valid" ref="loginForm" lazy-validation @submit.prevent="submit">
-          <v-text-field v-model="username" label=" Username" :rules="[rules.required]"
+          <v-text-field v-model="user.identifier" label=" Username" :rules="[rules.required]"
             prepend-inner-icon="mdi-account-outline" bg-color="white" variant="solo-filled" rounded="xl" flat
             class="mb-4" hide-details="auto" dense />
 
-          <v-text-field v-model="password" label="Password" :type="showPassword ? 'text' : 'password'"
+          <v-text-field v-model="user.password" label="Password" :type="showPassword ? 'text' : 'password'"
             :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" @click:append-inner="togglePasswordVisibility"
             :rules="[rules.required]" prepend-inner-icon="mdi-lock-outline" bg-color="white" rounded="xl"
             variant="solo-filled" flat class="mb-2" hide-details="auto" dense />
@@ -69,26 +69,24 @@ definePageMeta({
 useHead({
   title: "Log In",
 });
-const auth = useAuthStore();
-const { $api } = useNuxtApp();
 const router = useRouter();
 const snackbar = useSnackbar();
-// const { login, fetchUser } = useMyAuthStore()
-// const { authenticated } = storeToRefs(useMyAuthStore())
-// const { errorLogin } = storeToRefs(useMyAuthStore())
-// const { errorMessage } = storeToRefs(useMyAuthStore())
+const { login, fetchUser } = useMyAuthStore()
+const { authenticated } = storeToRefs(useMyAuthStore())
+const { errorLogin } = storeToRefs(useMyAuthStore())
+const { errorMessage } = storeToRefs(useMyAuthStore())
 
 
 //Major: Breaking changes
 //Minor: New Features, backward compatible
 //Patch: Bug fixes only
-const version = ref("1.20.0") //Major.Minor.Patch
+const version = ref("1.19.0") //Major.Minor.Patch
 const username = ref("");
 const password = ref("");
-// const user = ref({
-//   identifier: "",
-//   password: "",
-// });
+const user = ref({
+  identifier: "",
+  password: "",
+});
 const valid = ref(true);
 const showPassword = ref(false);
 const loginForm = ref(null);
@@ -109,35 +107,35 @@ const togglePasswordVisibility = () => {
 };
 
 const submit = async () => {
-  const { valid } = await loginForm.value?.validate()
+  const { valid, errors } = await loginForm.value?.validate()
   loading.value = true
   error.value = ''
 
   if (valid) {
-    console.log('logging in...')
-    try {
-      const { accessToken, user } = await $fetch('http://localhost:1337/api/auth/session',
-        {
-          method: 'POST',
-          credentials: 'include',
-          body: {
-            identifier: username.value,
-            password: password.value
-          }
-        }
-      )
-        console.log('logged in')
-      auth.setAuth(accessToken, user);
-      await navigateTo('/')
-    } catch (err) {
-      console.log(err.data)
-      loading.value = false;
-      // snackbar.add({
-      //   type: 'error',
-      //   text: err.data.error?.message || 'Login Failed'
-      // })
-    }
 
+    //console.log("Logging in...")
+    try {
+      await login(user.value)
+      if (authenticated.value == true) {
+        fetchUser();
+        //navigateTo(redirectByRole(auth.role))
+        loading.value = false
+        router.push('/')
+      }
+
+      if (errorLogin.value == true) {
+        loading.value = false;
+        snackbar.add({
+          type: 'error',
+          text: errorMessage.value,
+        })
+       
+        //console.log("Error login: ", errorMessage.value)
+      }
+    } catch (err) {
+      console.log(err)
+      loading.value = false;
+    }
 
   } else {
     loading.value = false;

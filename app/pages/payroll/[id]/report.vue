@@ -8,6 +8,7 @@
 
 <script setup>
 import qs from 'qs';
+const { $api } = useNuxtApp();
 const token = useCookie('token')
 definePageMeta({
   layout: "printing",
@@ -35,10 +36,8 @@ const fetchPayroll = async () => {
   //     Authorization: `Bearer ${token.value}`
   //   },
   // })
-  const res = await $fetch(`${baseUrl}/api/payroll-periods/${route.params.id}?${query}`, {
-    headers: {
-      Authorization: `Bearer ${token.value}`
-    },
+  const res = await $api(`/payroll-periods/${route.params.id}?${query}`, {
+    credentials: 'include',
   })
   payrollDetails.value = res.data;
 }

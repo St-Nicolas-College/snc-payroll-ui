@@ -1,122 +1,54 @@
-import { defineStore } from "pinia";
+import { defineStore } from 'pinia'
 
-interface UserPayloadInterface {
-  identifier: String;
-  password: String;
-}
-
-export const useMyAuthStore = defineStore("myAuthStore", {
-  state: () => ({
-    authenticated: false,
-    loading: false,
-    userInfo: {},
-    userRole: null as string | null,
-    userId: null,
-    errorLogin: false,
-    errorMessage: "",
+export const useAuthStore = defineStore('auth', {
+  state: () => ({ 
+    accessToken: null as string | null,
     user: null as any,
-    token: null as string | null,
-    //user: null as null | { username: string; account_type: string },
+    isRefreshing: false,
+    isReady: false
   }),
-
   getters: {
-    role: (state) => state.user?.role?.name || "guest",
-    isAdmin: (state) => state.user?.role?.name === "Admin",
-    isStaff: (state) => state.user?.role?.name === "Staff",
-    isAuthenticated: (state) => state.authenticated,
+    isLoggedIn: (state) => !!state.accessToken && !!state.user,
+    role: (state) => state.user?.role?.name || null,
+    userInfo: (state) => state.user?.user_info,
+    hasRole: (state) => (roles: string[] | string) => {
+      if (!state.user) return false
+      if (typeof roles === 'string') return state.user.role?.name === roles
+      return roles.includes(state.user.role?.name)
+    },
   },
   actions: {
-    async login({ identifier, password }: UserPayloadInterface) {
-      const config = useRuntimeConfig();
-
-      const { data, error }: any = await useFetch(
-        `${config.public.strapiUrl}/api/auth/local`,
-        {
-          method: "POST",
-          body: {
-            identifier,
-            password,
-          },
-        }
-      );
-
-      this.token = data.value?.jwt;
-
-      if (data.value) {
-        // Get user info with role
-        const me: any = await $fetch(
-          `${config.public.strapiUrl}/api/users/me?populate=role`,
-          {
-            headers: { Authorization: `Bearer ${this.token}` },
-          }
-        );
-        //let userRole = me.role?.name || null;
-        this.userRole = me.role?.name || null;
-        localStorage.setItem("role", this.userRole || "");
-        if (this.userRole !== "Admin" && this.userRole !== "Staff") {
-          this.errorLogin = true;
-          return error;
-        }
-
-        this.userId = data.value?.user?.id;
-        const token = useCookie("token");
-        token.value = data?.value?.jwt;
-        this.authenticated = true;
-        this.errorLogin = false;
-      } else {
-        this.errorLogin = true;
-        this.errorMessage = error.value.data.error.message;
-      }
+    setAuth(token: string, user: any) {
+      this.accessToken = token;
+      this.user = user;
     },
-
-    async fetchUser() {
-      const baseUrl = useRuntimeConfig().public.strapiUrl;
-      const token = useCookie("token");
-
-      this.loading = true;
-      this.errorLogin = false;
-
-      if (!token.value) {
-        this.user = null;
-        this.authenticated = false;
-        this.loading = false;
-        return;
-      }
-
-      try {
-        const { data, error } = await useFetch(
-          `${baseUrl}/api/users/me?populate=*`,
-          {
-            headers: {
-              Authorization: `Bearer ${token.value}`,
-            },
-          }
-        );
-
-        if (error.value || !data.value) {
-          this.user = null;
-          this.authenticated = false;
-        } else {
-          this.user = data.value;
-          this.authenticated = true;
-        }
-      } catch (err: any) {
-        this.user = null;
-        this.authenticated = false;
-        this.errorLogin = true;
-        this.errorMessage = err.message;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    logUserOut() {
-      const token = useCookie("token");
-      token.value = null;
-      this.authenticated = false;
+    // setToken(token: string) {
+    //   this.accessToken = token;
+    // },
+    clear() {
+      this.accessToken = null;
       this.user = null;
-      localStorage.clear();
-      //this.userInfo = {}
     },
-  },
-});
+
+    // =========================
+    // Fetch new access token from refresh token
+    // =========================
+    async refresh() {
+      if (this.isRefreshing) return
+      this.isRefreshing = true
+      try {
+        // @ts-ignore
+        const { accessToken, user } = await $fetch('http://localhost:1337/api/auth/refresh', {
+          method: 'POST',
+          credentials: 'include'
+        })
+        this.setAuth(accessToken, user)
+      } catch {
+        this.clear()
+      } finally {
+        this.isRefreshing = false
+        this.isReady = true
+      }
+    },
+  }
+})

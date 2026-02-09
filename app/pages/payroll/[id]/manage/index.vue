@@ -10,6 +10,11 @@
   title: 'Manage',
 
 })
+
+definePageMeta({
+  requiresAuth: true,
+  roles: ['Admin']
+})
 const breadcrumbItems = [
   { text: 'Dashboard', to: '/', icon: 'mdi-home-outline' },
   { text: 'Payroll Management', to: '/payroll' },

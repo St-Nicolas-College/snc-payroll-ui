@@ -37,7 +37,7 @@
           {{ formatDate(item.createdAt) }}
         </template>
         <template v-slot:[`item.user_info`]="{ item }">
-         {{ item.user_info?.first_name }} {{ item.user_info?.last_name || '-' }}
+          {{ item.user_info?.first_name }} {{ item.user_info?.last_name || '-' }}
         </template>
         <template v-slot:[`item.actions`]="{ item }">
 
@@ -123,11 +123,13 @@
 </template>
 
 <script setup>
+const auth = useAuthStore();
+const { $api } = useNuxtApp();
 const { user } = storeToRefs(useMyAuthStore())
 const token = useCookie('token')
 definePageMeta({
-  middleware: 'role-check',
-  allowedRoles: ['Staff']
+  requiresAuth: true,
+  roles: ['Admin', 'Manager']
 })
 useHead({
   title: 'Payroll',
@@ -177,10 +179,8 @@ onMounted(async () => {
 
 const getPayroll = async () => {
   try {
-    const res = await $fetch(`${baseUrl}/api/payroll-periods?populate=*`, {
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      },
+    const res = await $api(`/payroll-periods?populate=*`, {
+      credentials: 'include',
       query: {
         populate: '*',
         'pagination[page]': page.value,
@@ -216,19 +216,19 @@ const createPayroll = async () => {
     console.log("Cutoff Type: ", cutOffType.value)
     console.log("Pay Date: ", formatDateToYYYYMMDD(payDate.value))
     console.log("User: ", user.value?.user_info)
+    console.log("User New: ", auth.user?.user_info)
     loadingBtn.value = true;
 
-    await $fetch(`${baseUrl}/api/payroll-periods`, {
+    await $api(`/payroll-periods`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      },
+      credentials: 'include',
       body: {
         data: {
           payroll_period_start: firstPeriod,
           payroll_period_end: lastPeriod,
           cut_off_type: cutOffType.value,
-          pay_date: formatDateToYYYYMMDD(payDate.value)
+          pay_date: formatDateToYYYYMMDD(payDate.value),
+          user_info: auth.user?.user_info?.id
         }
 
       }

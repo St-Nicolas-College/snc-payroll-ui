@@ -235,7 +235,7 @@
                       <v-col cols="5">CA Deduction</v-col>
                       <v-col cols="1">:</v-col>
                       <v-col cols="6">
-                        {{ formatCurrency(payslipDetails.cash_advance_deduction) }}
+                        {{ formatCurrency(payslipDetails.cash_advance_payment?.cash_advance_payment || 0) }}
                       </v-col>
                     </v-row>
                     <v-row no-gutters>
@@ -312,9 +312,14 @@
 </template>
 
 <script setup>
+const { $api } = useNuxtApp();
   useHead({
   title: 'Payroll',
 
+})
+definePageMeta({
+    requiresAuth: true,
+  roles: ['Admin', 'Manager']
 })
 const token = useCookie('token')
 const baseUrl = useRuntimeConfig().public.strapiUrl
@@ -369,10 +374,8 @@ const rules = {
 
 
 const fetchPayslipDetails = async () => {
-  const res = await $fetch(`${baseUrl}/api/payslips/${manageId}?populate=*`, {
-    headers: {
-              Authorization: `Bearer ${token.value}`
-            },
+  const res = await $api(`/payslips/${manageId}?populate=*`, {
+    credentials: 'include'
   })
   // loading.value = false
   // payrollDetails.value = res.data;
@@ -392,18 +395,14 @@ const deletePayslipDetails = async () => {
 
   try {
     const [payslip, cashAdvance] = await Promise.all([
-      $fetch(`${baseUrl}/api/payslips/${manageId}`, {
+      $api(`/payslips/${manageId}`, {
         method: 'DELETE',
-        headers: {
-              Authorization: `Bearer ${token.value}`
-            },
+       credentials: 'include'
       }),
 
-      $fetch(`${baseUrl}/api/cash-advance-payments/${cashAdvanceId}`, {
+      $api(`/cash-advance-payments/${cashAdvanceId}`, {
         method: 'DELETE',
-        headers: {
-              Authorization: `Bearer ${token.value}`
-            },
+        credentials: 'include'
       })
     ])
     
