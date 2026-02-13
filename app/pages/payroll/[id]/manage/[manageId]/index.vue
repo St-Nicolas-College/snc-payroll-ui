@@ -324,6 +324,7 @@ definePageMeta({
 const token = useCookie('token')
 const baseUrl = useRuntimeConfig().public.strapiUrl
 const route = useRoute();
+const { triggerToast } = useToast()
 const payrollId = route.params.id
 const manageId = route.params.manageId
 const payslipDetails = ref({})
@@ -411,6 +412,7 @@ const deletePayslipDetails = async () => {
     //console.log('Payslip record deleted successfully')
     deletePayslipDialog.value = false
     navigateTo(`/payroll/${payrollId}`)
+    triggerToast('Payslip record deleted successfully!', 'success')
   } catch (err) {
 
   }

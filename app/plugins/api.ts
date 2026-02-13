@@ -1,8 +1,8 @@
 export default defineNuxtPlugin((nuxtApp) => {
   const auth = useAuthStore();
-
+const strapiBaseUrl = useRuntimeConfig().public.strapiUrl;
   const api = $fetch.create({
-    baseURL: "http://localhost:1337/api",
+    baseURL: `${strapiBaseUrl}/api`,
     credentials: "include",
 
     onRequest({ options }) {
@@ -19,7 +19,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       if (response.status === 401) {
         try {
           const refresh = await $fetch(
-            "http://localhost:1337/api/auth/refresh",
+            `${strapiBaseUrl}/api/auth/refresh`,
             {
               method: "POST",
               credentials: "include",
@@ -34,7 +34,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           return $fetch(request, options);
         } catch {
           auth.clear();
-          navigateTo("/login");
+          navigateTo("/auth/login");
         }
       }
     },

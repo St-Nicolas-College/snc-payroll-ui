@@ -11,6 +11,12 @@
 
         <h2 class="text-center font-weight-bold mb-6">Welcome Back!</h2>
 
+        <p v-if="showError" class="my-10"> <v-alert v-model="alert" border="start" color="error" variant="tonal">
+            {{ error }}
+
+
+          </v-alert></p>
+
         <v-form v-model="valid" ref="loginForm" lazy-validation @submit.prevent="submit">
           <v-text-field v-model="username" label=" Username" :rules="[rules.required]"
             prepend-inner-icon="mdi-account-outline" bg-color="white" variant="solo-filled" rounded="xl" flat
@@ -49,11 +55,11 @@
       </v-footer>
 
 
-      <v-snackbar v-model="snackbar1" location="top" color="error">
+      <v-snackbar v-model="snackbar1" variant="tonal" location="top right" color="error">
         {{ text }}
 
         <template v-slot:actions>
-          <v-btn variant="icon" @click="snackbar = false">
+          <v-btn variant="icon" @click="snackbar1 = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </template>
@@ -72,17 +78,14 @@ useHead({
 const auth = useAuthStore();
 const { $api } = useNuxtApp();
 const router = useRouter();
-const snackbar = useSnackbar();
-// const { login, fetchUser } = useMyAuthStore()
-// const { authenticated } = storeToRefs(useMyAuthStore())
-// const { errorLogin } = storeToRefs(useMyAuthStore())
-// const { errorMessage } = storeToRefs(useMyAuthStore())
+const { triggerToast } = useToast()
+
 
 
 //Major: Breaking changes
 //Minor: New Features, backward compatible
 //Patch: Bug fixes only
-const version = ref("1.20.0") //Major.Minor.Patch
+const version = ref("1.21.0") //Major.Minor.Patch
 const username = ref("");
 const password = ref("");
 // const user = ref({
@@ -96,6 +99,8 @@ const loading = ref(false);
 const error = ref('')
 const snackbar1 = ref(false);
 const text = ref("");
+const alert = ref(true)
+const showError = ref(false)
 
 
 const rules = {
@@ -111,12 +116,12 @@ const togglePasswordVisibility = () => {
 const submit = async () => {
   const { valid } = await loginForm.value?.validate()
   loading.value = true
-  error.value = ''
+  //error.value = ''
 
   if (valid) {
     console.log('logging in...')
     try {
-      const { accessToken, user } = await $fetch('http://localhost:1337/api/auth/session',
+      const { accessToken, user } = await $api('/auth/session',
         {
           method: 'POST',
           credentials: 'include',
@@ -126,16 +131,17 @@ const submit = async () => {
           }
         }
       )
-        console.log('logged in')
+      console.log('logged in')
       auth.setAuth(accessToken, user);
       await navigateTo('/')
     } catch (err) {
-      console.log(err.data)
+      console.log(err.data.error?.message || 'Login failed')
       loading.value = false;
-      // snackbar.add({
-      //   type: 'error',
-      //   text: err.data.error?.message || 'Login Failed'
-      // })
+
+      //  showError.value = true
+      //  error.value = err.data.error?.message || 'Login failed'
+      triggerToast(err.data.error?.message || 'Login failed', 'error');
+      console.log("error")
     }
 
 
@@ -163,5 +169,10 @@ body {
   /* Light Green to Dark Green */
   /* background: linear-gradient(180deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%); */
   background: #E0E0E0;
+}
+
+.snackbar-border {
+  border: 2px solid #000;
+  border-radius: 8px;
 }
 </style>

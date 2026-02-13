@@ -34,11 +34,12 @@ export const useAuthStore = defineStore('auth', {
     // Fetch new access token from refresh token
     // =========================
     async refresh() {
+      const baseUrl = useRuntimeConfig().public.strapiUrl;
       if (this.isRefreshing) return
       this.isRefreshing = true
       try {
         // @ts-ignore
-        const { accessToken, user } = await $fetch('http://localhost:1337/api/auth/refresh', {
+        const { accessToken, user } = await $fetch(`${baseUrl}/api/auth/refresh`, {
           method: 'POST',
           credentials: 'include'
         })

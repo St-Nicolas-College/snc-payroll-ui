@@ -697,6 +697,7 @@ const token = useCookie('token')
 const { smAndDown } = useDisplay()
 const baseUrl = useRuntimeConfig().public.strapiUrl
 const route = useRoute();
+const { triggerToast } = useToast()
 const breadcrumbItems = [
   { text: 'Dashboard', to: '/', icon: 'mdi-home-outline' },
   { text: 'Payroll Management', to: '/payroll' },
@@ -1030,7 +1031,8 @@ const submitForm = async () => {
       //console.log("Employee:", employee.value?.documentId)
       //console.log('Cash Advance', cashAdvance)
 
-      alert(`Payroll for ${employee.value?.employee_name} successfully created `)
+      //alert(`Payroll for ${employee.value?.employee_name} successfully created `)
+      triggerToast(`Payroll for ${employee.value?.employee_name} successfully created`, 'success')
       payrollEnlistmentForm.value?.reset()
       resetFormCreateEmployee()
       createEmployeePayrollDialog.value = false
@@ -1051,7 +1053,8 @@ const submitForm = async () => {
           console.error('Rollback failed:', rollbackError)
         }
       }
-      alert(message)
+      // alert(message)
+      triggerToast(message, 'error')
     }
 
 

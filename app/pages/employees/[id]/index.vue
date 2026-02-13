@@ -712,6 +712,7 @@
 <script setup>
 const auth = useAuthStore();
 const { $api } = useNuxtApp();
+const { triggerToast } = useToast()
 import qs from 'qs';
 definePageMeta({
   requiresAuth: true,
@@ -839,6 +840,7 @@ const fetchEmployeeDetails = async () => {
     }
   } catch (err) {
     console.log('Failed to fetch data.', err)
+    triggerToast('Failed to fetch data.', 'error')
     throw err;
   }
 }
@@ -898,10 +900,12 @@ const updateEmployee = async () => {
     loadingBtn.value = false
     fetchEmployeeDetails()
     updateEmployeeDialog.value = false
-    alert("Employee details updated successfully!")
+    //alert("Employee details updated successfully!")
+    triggerToast("Employee details updated successfully!", 'success')
   } catch (err) {
     loadingBtn.value = false
     console.error('Error updating..', err)
+    triggerToast('Error updating..', 'error')
   } finally {
     loadingBtn.value = false
   }
@@ -927,7 +931,8 @@ const createCashAdvance = async () => {
       })
       loadingCABtn.value = false
       console.log("Successfully Created");
-      alert(`Cash Advance amounting to ${cashAdvanceForm.value.amount} successfully added!`)
+      //alert(`Cash Advance amounting to ${cashAdvanceForm.value.amount} successfully added!`)
+      triggerToast(`Cash Advance amounting to ${cashAdvanceForm.value.amount} successfully added!`, 'success')
       addCashAdvanceForm.value?.reset()
       fetchEmployeeDetails();
       cashAdvanceDialog.value = false
@@ -936,6 +941,7 @@ const createCashAdvance = async () => {
       loadingCABtn.value = false
       const message = err?.response?._data?.error?.message || "Unknown error";
       console.log("Error message: ", message)
+      triggerToast(message, 'error')
     } finally {
       loadingCABtn.value = false
     }
@@ -968,11 +974,13 @@ const updateCAAmount = async () => {
       })
       loadingCABtn.value = false
       disabledUpdateCA.value = true
-      alert(`Cash advance amount update to ${cashAdvanceDetails.value.cash_advance_amount}`)
+      //alert(`Cash advance amount update to ${cashAdvanceDetails.value.cash_advance_amount}`)
+      triggerToast(`Cash advance amount updated to ${cashAdvanceDetails.value.cash_advance_amount}`, 'success')
       fetchEmployeeDetails();
     } catch (err) {
       const message = err?.response?._data?.error?.message || "Unknown error";
       console.log("Error message: ", message)
+      triggerToast(message, 'error')
       loadingCABtn.value = false
     } finally {
       loadingCABtn.value = false

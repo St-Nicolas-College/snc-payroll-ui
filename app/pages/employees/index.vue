@@ -123,6 +123,7 @@
 <script setup>
 const auth = useAuthStore();
 const { $api } = useNuxtApp();
+const { triggerToast } = useToast()
 useHead({
   title: 'Employees',
 
@@ -147,7 +148,8 @@ const header = [
   { title: 'Premium', key: 'premium', sortable: false },
   { title: 'Actions', key: 'actions', align: 'end', sortable: false },
 ];
-
+const search = ref('')
+const loading = ref(true)
 const formValid = ref(null)
 const employees = ref([])
 const employee_id = ref('')
@@ -253,7 +255,8 @@ const createEmployee = async () => {
       getUsers();
       loadingBtn.value = false
       //console.log("Employee successfully created: ", payload)
-      alert("Employee successfully created")
+      //alert("Employee successfully created")
+      triggerToast('Employee successfully created!', 'success')
       createEmployeeForm.value?.reset();
       basicPay.value = 0;
       honorarium.value = 0;
@@ -271,6 +274,7 @@ const createEmployee = async () => {
     } catch (err) {
       loadingBtn.value = false
       console.error("Error creating.", err)
+      triggerToast('Error creating.', 'error')
     }
   } else {
     loadingBtn.value = false
@@ -286,45 +290,7 @@ const itemProps = async (item) => {
   }
 }
 
-const items = ref([])
-const search = ref('')
-const loading = ref(true)
-const createUserDialog = ref(false)
 
-// const form = ref({
-//   payroll_period: '',
-//   employee: employee_id,
-//   basic_pay: 0,
-//   honorarium: 0,
-//   premium: 0,
-//   extra_loads: 0,
-//   overtime: 0,
-//   late_deduction: 0,
-//   sss: 0,
-//   philhealth: 0,
-//   pagibig: 0,
-//   withholding_tax: 0,
-//   sss_loan: 0,
-//   pagibig_loan: 0,
-//   cash_advance: 0,
-//   health_card: 0
-// })
-
-// const computeValues = () => {
-//   const f = form.value
-//   f.gross_pay =
-//     f.basic_pay + f.honorarium + f.premium +
-//     f.extra_loads + f.overtime - f.late_deduction
-
-//   f.net_gross_pay =
-//     f.gross_pay - (f.sss + f.philhealth + f.pagibig)
-
-//   f.net_pay =
-//     f.net_gross_pay -
-//     (f.withholding_tax + f.sss_loan + f.pagibig_loan + f.cash_advance + f.health_card)
-// }
-
-// watch(form, computeValues, { deep: true })
 
 
 </script>

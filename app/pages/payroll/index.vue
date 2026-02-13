@@ -127,6 +127,7 @@ const auth = useAuthStore();
 const { $api } = useNuxtApp();
 const { user } = storeToRefs(useMyAuthStore())
 const token = useCookie('token')
+const { triggerToast } = useToast()
 definePageMeta({
   requiresAuth: true,
   roles: ['Admin', 'Manager']
@@ -196,6 +197,7 @@ const getPayroll = async () => {
     }
   } catch (err) {
     console.error('Failed to fetch data.', err)
+    triggerToast('Failed to fetch data', 'error');
     loading.value = false
     throw err;
   }
@@ -239,9 +241,11 @@ const createPayroll = async () => {
     cutOffType.value = null,
       payrollPeriod.value = null,
       payDate.value = null
-    alert('Payroll Period successfully created!')
+    //alert('Payroll Period successfully created!')
+    triggerToast('Payroll Period successfully created!', 'success');
   } catch (err) {
     console.error('Error creating payroll', err);
+    triggerToast('Error creating payroll', err)
     loadingBtn.value = false
   }
 

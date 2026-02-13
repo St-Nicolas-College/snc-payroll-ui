@@ -26,14 +26,8 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@pinia/nuxt", "nuxt-snackbar"],
-  snackbar: {
-    top: true,
-    bottom: false,
-    right: true,
-    duration: 3000,
-    border: 'left',
-  },
+  modules: ["@pinia/nuxt"],
+  
   runtimeConfig: {
     public: {
       //@ts-ignore

@@ -163,6 +163,7 @@
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
 const token = useCookie('token')
+const { triggerToast } = useToast()
 useHead({
   title: 'Print',
 
@@ -213,7 +214,8 @@ const newApprovedBy =  ref('')
 
 const updateSignatory = () => {
   approvedBy.value = newApprovedBy.value
-  alert("Signatory updated successfully!")
+  //alert("Signatory updated successfully!")
+  triggerToast("Signatory updated successfully!", 'success')
   signatory.value = false
 }
 
