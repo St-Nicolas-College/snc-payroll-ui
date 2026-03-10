@@ -71,12 +71,14 @@
 <script setup>
 definePageMeta({
   layout: "auth",
+  middleware: 'guest'
 });
 useHead({
   title: "Log In",
 });
-const auth = useAuthStore();
-const { $api } = useNuxtApp();
+const { login } = useAuth();
+// const auth = useAuthStore();
+// const { $api } = useNuxtApp();
 const router = useRouter();
 const { triggerToast } = useToast()
 
@@ -85,13 +87,9 @@ const { triggerToast } = useToast()
 //Major: Breaking changes
 //Minor: New Features, backward compatible
 //Patch: Bug fixes only
-const version = ref("1.21.0") //Major.Minor.Patch
+const version = ref("1.22.0") //Major.Minor.Patch
 const username = ref("");
 const password = ref("");
-// const user = ref({
-//   identifier: "",
-//   password: "",
-// });
 const valid = ref(true);
 const showPassword = ref(false);
 const loginForm = ref(null);
@@ -121,27 +119,28 @@ const submit = async () => {
   if (valid) {
     console.log('logging in...')
     try {
-      const { accessToken, user } = await $api('/auth/session',
-        {
-          method: 'POST',
-          credentials: 'include',
-          body: {
-            identifier: username.value,
-            password: password.value
-          }
-        }
-      )
-      console.log('logged in')
-      auth.setAuth(accessToken, user);
-      await navigateTo('/')
+      // const { accessToken, user } = await $api('/auth/session',
+      //   {
+      //     method: 'POST',
+      //     credentials: 'include',
+      //     body: {
+      //       identifier: username.value,
+      //       password: password.value
+      //     }
+      //   }
+      // )
+      // console.log('logged in')
+      await login(username.value, password.value)
+      loading.value = false
+      navigateTo('/')
     } catch (err) {
-      console.log(err.data.error?.message || 'Login failed')
+      console.log(err.data?.data?.error?.message || 'Login failed')
       loading.value = false;
 
       //  showError.value = true
       //  error.value = err.data.error?.message || 'Login failed'
-      triggerToast(err.data.error?.message || 'Login failed', 'error');
-      console.log("error")
+      triggerToast(err.data?.data?.error?.message || 'Login failed', 'error');
+      //console.log("error")
     }
 
 

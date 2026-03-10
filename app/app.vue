@@ -1,11 +1,11 @@
-
 <template>
 
-  <NuxtLayout>
+  <NuxtLayout v-if="authReady">
     <AppLoader :show="isLoading" />
 
     <NuxtPage />
-    <v-snackbar v-model="show" :color="color" variant="tonal" location="bottom right" timeout="3000" content-class="toast-left-border">
+    <v-snackbar v-model="show" :color="color" variant="tonal" location="bottom right" timeout="3000"
+      content-class="toast-left-border">
       <v-icon start class="mr-2">{{ icon }}</v-icon>
       {{ message }}
 
@@ -15,12 +15,16 @@
       </template>
     </v-snackbar>
   </NuxtLayout>
+  <div v-else>
+    loading application...
+  </div>
 
 </template>
 
 <script setup>
 const { isLoading } = useLoader()
 const { show, message, color, icon } = useToast()
+const { authReady } = useAuth()
 </script>
 <style>
 .toast-left-border {

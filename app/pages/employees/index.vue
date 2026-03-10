@@ -121,7 +121,7 @@
 </template>
 
 <script setup>
-const auth = useAuthStore();
+// const auth = useAuthStore();
 const { $api } = useNuxtApp();
 const { triggerToast } = useToast()
 useHead({
@@ -131,8 +131,9 @@ useHead({
 const token = useCookie('token')
 const baseUrl = useRuntimeConfig().public.strapiUrl
 definePageMeta({
-  requiresAuth: true,
-  roles: ['Admin', 'Staff']
+  // requiresAuth: true,
+  middleware: ['auth', 'role'],
+  role: ['Admin', 'Staff']
 })
 const breadcrumbItems = [
   { text: 'Dashboard', to: '/', icon: 'mdi-home-outline' },

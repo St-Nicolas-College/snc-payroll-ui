@@ -12,8 +12,9 @@
 })
 
 definePageMeta({
-  requiresAuth: true,
-  roles: ['Admin']
+  // requiresAuth: true,
+  middleware: ['auth', 'role'],
+  role: ['Admin']
 })
 const breadcrumbItems = [
   { text: 'Dashboard', to: '/', icon: 'mdi-home-outline' },

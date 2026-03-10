@@ -16,7 +16,7 @@
                   Payroll Details
                 </span>
               </v-col>
-             
+
 
               <!-- RIGHT: ACTION BUTTONS -->
               <v-col cols="12" md="6" class="d-flex justify-end" :class="smAndDown ? 'flex-column ga-2' : 'ga-2'">
@@ -72,7 +72,7 @@
                           <v-row dense>
                             <v-col cols="7" class="font-weight-bold"> Payroll Cover Start:</v-col>
                             <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_start)
-                              }}</v-col>
+                            }}</v-col>
                           </v-row>
                         </v-card>
                       </v-col>
@@ -83,7 +83,7 @@
                           <v-row dense>
                             <v-col cols="7" class="font-weight-bold"> Payroll Cover End:</v-col>
                             <v-col cols="5"> {{ formatDate(payrollDetails.payroll_period_end)
-                              }}</v-col>
+                            }}</v-col>
                           </v-row>
                         </v-card>
                       </v-col>
@@ -96,7 +96,7 @@
                           <v-row dense>
                             <v-col cols="7" class="font-weight-bold"> Pay Date:</v-col>
                             <v-col cols="5"> {{ formatDate(payrollDetails.pay_date)
-                              }}</v-col>
+                            }}</v-col>
                           </v-row>
                         </v-card>
                       </v-col>
@@ -358,7 +358,7 @@
 
             <h3 class="text-center">Payroll Period</h3>
             <h4 class="text-center">{{ formatDate(payrollDetails.payroll_period_start)
-              }} - {{ formatDate(payrollDetails.payroll_period_end)
+            }} - {{ formatDate(payrollDetails.payroll_period_end)
               }}</h4>
             <div v-if="payrollDetails.cut_off_type == 'first_half'">
               <h4 class="text-center">15th (Kinsenas)</h4>
@@ -688,8 +688,9 @@ useHead({
 
 })
 definePageMeta({
-    requiresAuth: true,
-  roles: ['Admin', 'Manager']
+  // requiresAuth: true,
+  middleware: ['auth', 'role'],
+  role: ['Admin', 'Manager']
 })
 import qs from 'qs';
 import { useDisplay } from 'vuetify'

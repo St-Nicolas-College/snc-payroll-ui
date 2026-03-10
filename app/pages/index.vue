@@ -12,9 +12,9 @@ useHead({
 
 })
 definePageMeta({
-  //middleware: 'auth',
-  requiresAuth: true,
-  roles: ['Admin', 'Staff']
+  middleware: ['auth', 'role'],
+  //requiresAuth: true,
+  role: ['Admin', 'Staff']
 })
 </script>
 

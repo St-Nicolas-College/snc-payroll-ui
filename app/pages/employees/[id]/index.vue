@@ -710,13 +710,14 @@
 </template>
 
 <script setup>
-const auth = useAuthStore();
+// const auth = useAuthStore();
 const { $api } = useNuxtApp();
 const { triggerToast } = useToast()
 import qs from 'qs';
 definePageMeta({
-  requiresAuth: true,
-  roles: ['Admin', 'Staff']
+  // requiresAuth: true,
+  middleware: ['auth', 'role'],
+  role: ['Admin', 'Staff']
 })
 useHead({
   title: 'Employee Details',

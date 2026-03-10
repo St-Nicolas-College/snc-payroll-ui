@@ -123,14 +123,15 @@
 </template>
 
 <script setup>
-const auth = useAuthStore();
+// const auth = useAuthStore();
 const { $api } = useNuxtApp();
 const { user } = storeToRefs(useMyAuthStore())
 const token = useCookie('token')
 const { triggerToast } = useToast()
 definePageMeta({
-  requiresAuth: true,
-  roles: ['Admin', 'Manager']
+  // requiresAuth: true,
+  middleware: ['auth', 'role'],
+  role: ['Admin']
 })
 useHead({
   title: 'Payroll',

@@ -1,46 +1,36 @@
 export default defineNuxtPlugin((nuxtApp) => {
-  const auth = useAuthStore();
-const strapiBaseUrl = useRuntimeConfig().public.strapiUrl;
+  const token = useState("token");
+  const strapiBaseUrl = useRuntimeConfig().public.strapiUrl;
   const api = $fetch.create({
     baseURL: `${strapiBaseUrl}/api`,
     credentials: "include",
 
-    onRequest({ options }) {
-      if (auth.accessToken) {
+    async onRequest({ options }) {
+      if (token.value) {
         options.headers = {
           ...options.headers,
           //@ts-ignore
-          Authorization: `Bearer ${auth.accessToken}`,
+          Authorization: `Bearer ${token.value}`,
         };
       }
     },
 
-    async onResponseError({ response, request, options }) {
+    async onResponseError({ response, request }) {
       if (response.status === 401) {
-        try {
-          const refresh = await $fetch(
-            `${strapiBaseUrl}/api/auth/refresh`,
-            {
-              method: "POST",
-              credentials: "include",
-            },
-          );
+        const refresh: any = await $fetch("/api/refresh", {
+          method: "POST",
+        });
 
-          //@ts-ignore
-          auth.setToken(refresh.accessToken);
-          //@ts-ignore
-          options.headers.Authorization = `Bearer ${refresh.accessToken}`;
-          //@ts-ignore
-          return $fetch(request, options);
-        } catch {
-          auth.clear();
-          navigateTo("/auth/login");
-        }
+        token.value = refresh.jwt;
+
+        return $fetch(request);
       }
     },
   });
 
   return {
-    provide: { api },
+    provide: {
+      api,
+    },
   };
 });

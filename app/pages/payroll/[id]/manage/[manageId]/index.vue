@@ -54,7 +54,7 @@
 
           <h3 class="text-center">Payroll Period</h3>
           <h4 class="text-center">{{ formatDate(payrollPeriod.payroll_period_start)
-          }} - {{ formatDate(payrollPeriod.payroll_period_end)
+            }} - {{ formatDate(payrollPeriod.payroll_period_end)
             }}</h4>
           <v-divider class="mt-5"></v-divider>
           <v-card-text>
@@ -313,13 +313,14 @@
 
 <script setup>
 const { $api } = useNuxtApp();
-  useHead({
+useHead({
   title: 'Payroll',
 
 })
 definePageMeta({
-    requiresAuth: true,
-  roles: ['Admin', 'Manager']
+  // requiresAuth: true,
+  middleware: ['auth', 'role'],
+  role: ['Admin', 'Manager']
 })
 const token = useCookie('token')
 const baseUrl = useRuntimeConfig().public.strapiUrl
@@ -398,7 +399,7 @@ const deletePayslipDetails = async () => {
     const [payslip, cashAdvance] = await Promise.all([
       $api(`/payslips/${manageId}`, {
         method: 'DELETE',
-       credentials: 'include'
+        credentials: 'include'
       }),
 
       $api(`/cash-advance-payments/${cashAdvanceId}`, {
@@ -406,7 +407,7 @@ const deletePayslipDetails = async () => {
         credentials: 'include'
       })
     ])
-    
+
     //console.log('Payslip deleted..', payslip);
     //console.log('Cash advance payment deteled..', cashAdvance)
     //console.log('Payslip record deleted successfully')
@@ -469,6 +470,7 @@ onMounted(async () => {
   /* background: linear-gradient(90deg, #16a34a, #22c55e); success */
   background: linear-gradient(90deg, #f59e0b, #fbbf24);
 }
+
 .total-netpay {
   font-size: 2vh;
   text-transform: uppercase;

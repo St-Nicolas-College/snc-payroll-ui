@@ -10,7 +10,7 @@
           <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard" value="dashboard" :to="'/'" class="mb-2"
             active-class="v-list-item--active-custom">
           </v-list-item>
-          <v-list-item v-if="auth.role === 'Admin'" prepend-icon="mdi-cash-sync" title="Payroll" value="payroll" :to="'/payroll'"
+          <v-list-item v-if="user?.role === 'Admin'" prepend-icon="mdi-cash-sync" title="Payroll" value="payroll" :to="'/payroll'"
             :active="$route.path.startsWith('/payroll')" class="mb-2" active-class="v-list-item--active-custom">
           </v-list-item>
           <v-list-item prepend-icon="mdi-account-group" title="Employees" value="employees" to="/employees"
@@ -30,21 +30,21 @@
             <v-row align="center" dense>
               <v-col cols="auto">
                 <v-avatar size="40" color="primary">
-                  <span>{{ userInitial }}</span>
+                  <span>{{userInitial}}</span>
                 </v-avatar>
               </v-col>
               <v-col class="py-0">
                 <div class="font-weight-medium text-body-2">
                   <!-- {{ user?.user_info?.first_name }} {{ user?.user_info?.last_name }} -->
-                  {{ auth.user?.user_info?.first_name }}  {{ auth.user?.user_info?.last_name }}
+                  {{ user?.user_info?.first_name }}  {{ user?.user_info?.last_name }}
                 </div>
                 <div class="text-caption text-grey">
                   <!-- {{ user?.user_info?.position }} -->
-                    {{ auth.user?.user_info?.position }}
+                    {{ user?.user_info?.position }}
                 </div>
               </v-col>
               <v-col cols="12">
-                <v-btn color="red-darken-3" variant="tonal" block size="small" @click="handleLogout()">
+                <v-btn color="red-darken-3" variant="tonal" block size="small" @click="logout">
                   <v-icon>mdi-power</v-icon>
                 </v-btn>
               </v-col>
@@ -139,8 +139,9 @@
 <script setup>
 import { useTheme } from "vuetify";
 import { useDisplay } from "vuetify/lib/composables/display.mjs";
-const auth = useAuthStore();
-const { $api } = useNuxtApp();
+// const auth = useAuthStore();
+// const { $api } = useNuxtApp();
+const { logout, user } = useAuth()
 
 const { smAndDown } = useDisplay()
 //const { logUserOut } = useMyAuthStore()
@@ -151,19 +152,19 @@ const links = [
     title: "Dashboard",
     to: '/',
     icon: "mdi-view-dashboard",
-    roles: ["Staff"]
+    //roles: ["Staff"]
   },
   {
     title: "Payroll",
     to: '/payroll',
     icon: "mdi-cash-sync",
-    roles: ["Staff"]
+    //roles: ["Staff"]
   },
   {
     title: "Employees",
     to: '/employees',
     icon: "mdi-account-group",
-    roles: ["Staff"]
+    //roles: ["Staff"]
   }
 ]
 
@@ -179,7 +180,7 @@ theme.change('light')
 // })
 
 //const userInitial = ref(user.value.user_info?.first_name.substring(0, 1) + user.value.user_info?.last_name.substring(0, 1))
-const userInitial = ref(auth.user?.user_info?.first_name.substring(0, 1) + auth.user?.user_info?.last_name.substring(0, 1))
+const userInitial = ref(user.value?.user_info?.first_name.substring(0, 1) + user.value?.user_info?.last_name.substring(0, 1))
 
 // Function to toggle between dark and light themes
 function toggleTheme() {
@@ -189,14 +190,14 @@ function toggleTheme() {
   theme.change(isDark ? 'light' : 'dark')
 }
 
-const handleLogout = async () => {
- await $api('/auth/logout', {
-    method: 'POST',
-    credentials: 'include'
-  });
-  auth.clear();
-  navigateTo('/auth/login')
-};
+// const handleLogout = async () => {
+//  await $api('/auth/logout', {
+//     method: 'POST',
+//     credentials: 'include'
+//   });
+//   auth.clear();
+//   navigateTo('/auth/login')
+// };
 
 watch(mobile, (isMobile) => {
   drawer.value = !isMobile;
