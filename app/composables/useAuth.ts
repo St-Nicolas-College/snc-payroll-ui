@@ -14,6 +14,7 @@ export const useAuth = () => {
     token.value = res.jwt;
     refreshToken.value = res.refreshToken;
     user.value = JSON.stringify(res.user);
+    //user.value = res.user;
   };
 
   const logout = async () => {

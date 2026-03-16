@@ -133,7 +133,7 @@ const baseUrl = useRuntimeConfig().public.strapiUrl
 definePageMeta({
   // requiresAuth: true,
   middleware: ['auth', 'role'],
-  role: ['Admin', 'Staff']
+  role: ['Admin', 'Manager', 'Staff']
 })
 const breadcrumbItems = [
   { text: 'Dashboard', to: '/', icon: 'mdi-home-outline' },

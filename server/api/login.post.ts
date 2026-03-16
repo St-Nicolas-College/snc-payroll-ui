@@ -11,13 +11,23 @@ export default defineEventHandler(async (event) => {
     },
   });
 
+  // FOR LOCAL DEVELOPMENT
   setCookie(event, "refreshToken", res.refreshToken, {
     httpOnly: true,
-    sameSite: "none",
-    secure: true,
+    sameSite: "lax",
+    secure: false,
     path: "/",
     maxAge: 60 * 60 * 24 * 7 // 7 days
   });
+
+  // FOR PRODUCTION
+  // setCookie(event, "refreshToken", res.refreshToken, {
+  //   httpOnly: true,
+  //   sameSite: "none",
+  //   secure: true,
+  //   path: "/",
+  //   maxAge: 60 * 60 * 24 * 7 // 7 days
+  // });
 
   return {
     jwt: res.jwt,

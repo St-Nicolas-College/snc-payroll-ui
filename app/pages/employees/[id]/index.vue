@@ -717,7 +717,7 @@ import qs from 'qs';
 definePageMeta({
   // requiresAuth: true,
   middleware: ['auth', 'role'],
-  role: ['Admin', 'Staff']
+  role: ['Admin', 'Manager', 'Staff']
 })
 useHead({
   title: 'Employee Details',

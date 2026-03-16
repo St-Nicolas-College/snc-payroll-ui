@@ -20,7 +20,7 @@ RUN yarn install
 # Assign ENV variables
 # Bind the App to any IP
 ENV NODE_ENV=production
-ENV NITRO_PORT=3007
+ENV NITRO_PORT=3006
 ENV NITRO_HOST=0.0.0.0
 # ENV STRAPI_BASEURL=STRAPI_BASEURL
 

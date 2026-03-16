@@ -125,13 +125,14 @@
 <script setup>
 // const auth = useAuthStore();
 const { $api } = useNuxtApp();
-const { user } = storeToRefs(useMyAuthStore())
+//const { user } = storeToRefs(useMyAuthStore())
+const {  user } = useAuth()
 const token = useCookie('token')
 const { triggerToast } = useToast()
 definePageMeta({
   // requiresAuth: true,
   middleware: ['auth', 'role'],
-  role: ['Admin']
+  role: ['Admin', 'Manager']
 })
 useHead({
   title: 'Payroll',
@@ -218,8 +219,8 @@ const createPayroll = async () => {
     console.log('Payroll Period: ', payrollPeriod.value)
     console.log("Cutoff Type: ", cutOffType.value)
     console.log("Pay Date: ", formatDateToYYYYMMDD(payDate.value))
-    console.log("User: ", user.value?.user_info)
-    console.log("User New: ", auth.user?.user_info)
+    console.log("User: ", user.value?.user_info?.id)
+    //console.log("User New: ", auth.user?.user_info)
     loadingBtn.value = true;
 
     await $api(`/payroll-periods`, {
@@ -231,7 +232,8 @@ const createPayroll = async () => {
           payroll_period_end: lastPeriod,
           cut_off_type: cutOffType.value,
           pay_date: formatDateToYYYYMMDD(payDate.value),
-          user_info: auth.user?.user_info?.id
+          user_info: user.value?.user_info?.id
+  
         }
 
       }

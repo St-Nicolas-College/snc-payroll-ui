@@ -10,7 +10,7 @@
           <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard" value="dashboard" :to="'/'" class="mb-2"
             active-class="v-list-item--active-custom">
           </v-list-item>
-          <v-list-item v-if="user?.role === 'Admin'" prepend-icon="mdi-cash-sync" title="Payroll" value="payroll" :to="'/payroll'"
+          <v-list-item v-if="user?.role === 'Admin' || user?.role === 'Manager'" prepend-icon="mdi-cash-sync" title="Payroll" value="payroll" :to="'/payroll'"
             :active="$route.path.startsWith('/payroll')" class="mb-2" active-class="v-list-item--active-custom">
           </v-list-item>
           <v-list-item prepend-icon="mdi-account-group" title="Employees" value="employees" to="/employees"
