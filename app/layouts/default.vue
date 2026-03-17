@@ -10,8 +10,9 @@
           <v-list-item prepend-icon="mdi-view-dashboard" title="Dashboard" value="dashboard" :to="'/'" class="mb-2"
             active-class="v-list-item--active-custom">
           </v-list-item>
-          <v-list-item v-if="user?.role === 'Admin' || user?.role === 'Manager'" prepend-icon="mdi-cash-sync" title="Payroll" value="payroll" :to="'/payroll'"
-            :active="$route.path.startsWith('/payroll')" class="mb-2" active-class="v-list-item--active-custom">
+          <v-list-item v-if="user?.role === 'Admin' || user?.role === 'Manager'" prepend-icon="mdi-cash-sync"
+            title="Payroll" value="payroll" :to="'/payroll'" :active="$route.path.startsWith('/payroll')" class="mb-2"
+            active-class="v-list-item--active-custom">
           </v-list-item>
           <v-list-item prepend-icon="mdi-account-group" title="Employees" value="employees" to="/employees"
             active-class="v-list-item--active-custom" :active="$route.path.startsWith('/employees')"></v-list-item>
@@ -30,17 +31,17 @@
             <v-row align="center" dense>
               <v-col cols="auto">
                 <v-avatar size="40" color="primary">
-                  <span>{{userInitial}}</span>
+                  <span>{{ userInitial }}</span>
                 </v-avatar>
               </v-col>
               <v-col class="py-0">
                 <div class="font-weight-medium text-body-2">
                   <!-- {{ user?.user_info?.first_name }} {{ user?.user_info?.last_name }} -->
-                  {{ user?.user_info?.first_name }}  {{ user?.user_info?.last_name }}
+                  {{ user?.user_info?.first_name }} {{ user?.user_info?.last_name }}
                 </div>
                 <div class="text-caption text-grey">
                   <!-- {{ user?.user_info?.position }} -->
-                    {{ user?.user_info?.position }}
+                  {{ user?.user_info?.position }}
                 </div>
               </v-col>
               <v-col cols="12">
@@ -94,9 +95,11 @@
           </v-list-item>
         </v-list>
       </v-menu> -->
+
+      <v-btn v-if="user?.role === 'Admin'" prepend-icon="mdi-logout" color="blue" variant="elevated" class="text-capitalize" to="/admin">Go to Admin Panel</v-btn>
     </v-app-bar>
 
-    
+
 
     <v-main>
       <v-container fluid>
@@ -104,12 +107,7 @@
       </v-container>
     </v-main>
 
-    <v-bottom-navigation
-      v-model="value"
-      color="primary"
-      class="d-flex d-sm-none"
-      active
-    >
+    <v-bottom-navigation v-model="value" color="primary" class="d-flex d-sm-none" active>
       <v-btn to="/">
         <v-icon>mdi-home</v-icon>
         Home
@@ -117,19 +115,16 @@
 
       <v-btn to="/payroll">
         <v-icon>mdi-cash-sync</v-icon>
-
         Payroll
       </v-btn>
 
       <v-btn to="/employees">
         <v-icon>mdi-account-supervisor</v-icon>
-
         <span>Employees</span>
       </v-btn>
 
       <v-btn to="/account-settings">
         <v-icon>mdi-cog</v-icon>
-
         <span>Settings</span>
       </v-btn>
     </v-bottom-navigation>

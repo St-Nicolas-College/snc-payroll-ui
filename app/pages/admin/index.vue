@@ -1,26 +1,28 @@
 <template>
-  <div>
-    <h1>Admin Page</h1>
-    <v-btn @click="handleLogout">Logout</v-btn>
+  <div class="d-flex align-center justify-center" style="height: 80vh;">
+  
+    <v-card width="500" elevation="0" rounded="lg">
+      <v-card-text>
+        <h4>Welcome to Admin Panel</h4>
+        <v-btn prepend-icon="mdi-power" class="text-capitalize" color="info" block>Logout</v-btn>
+      </v-card-text>
+    </v-card>
   </div>
 </template>
 
 <script setup>
-const { logUserOut } = useMyAuthStore()
+const { logout, user } = useAuth()
 definePageMeta({
   layout: 'admin',
-  requiredRole: 'Admin',
+  middleware: ['auth', 'role'],
+  role: ['Admin']
 })
 useHead({
   title: 'Admin',
 
 })
 
-const handleLogout = () => {
-  logUserOut();
-  //router.push("/auth/login")
-  window.location.href = "/auth/login";
-};
+
 </script>
 
 <style></style>

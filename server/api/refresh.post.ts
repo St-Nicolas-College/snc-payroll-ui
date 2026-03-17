@@ -19,6 +19,7 @@ export default defineEventHandler(async (event) => {
 
   return {
     jwt: res.jwt,
+    user: res.user
   };
 
 })

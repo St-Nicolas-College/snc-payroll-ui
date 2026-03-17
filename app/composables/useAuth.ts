@@ -1,5 +1,5 @@
 export const useAuth = () => {
-   const token = useState<any>("token"); // persists after reload
+  const token = useState<any>("token"); // persists after reload
   const refreshToken = useCookie("refreshToken");
   const user = useCookie("user");
 
@@ -13,8 +13,8 @@ export const useAuth = () => {
 
     token.value = res.jwt;
     refreshToken.value = res.refreshToken;
-    user.value = JSON.stringify(res.user);
-    //user.value = res.user;
+    //user.value = JSON.stringify(res.user);
+    user.value = res.user;
   };
 
   const logout = async () => {
@@ -44,5 +44,4 @@ export const useAuth = () => {
   };
 
   return { login, logout, refresh, token, refreshToken, user, authReady };
-
-}
+};
